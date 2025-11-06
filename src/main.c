@@ -12,8 +12,8 @@ int main() {
     double optval;
     float fo, percent = 0.2;
     city *cities, *initial_solution;
-    int **distances, **symmetric_distances, *tour = NULL, *original_tour = NULL;
-    unsigned int num_cities, num_initial_solution, num_original_tour, prize_goal;
+    int **distances, **symmetric_distances, *tour = NULL, *original_tour = NULL, *local_search_tour = NULL;
+    unsigned int num_cities, num_initial_solution, num_original_tour, prize_goal, num_random_cities = 3;
 
     init_environment("dataset/atex1", &cities, &distances, &num_cities, percent, &prize_goal);
     build_initial_solution(&cities, &num_cities, &prize_goal, &initial_solution, &num_initial_solution, &num_original_tour);
@@ -30,13 +30,11 @@ int main() {
             print_tour(original_tour, num_original_tour);
             fo = calculate_objective_function(original_tour, num_original_tour, distances, cities, num_cities);
             printf("Valor da função objetivo: %.2f\n", fo);
-            printf("Busca local iniciada...\n\n");
-            unsigned int k = 3;
-            int *improved_tour = local_search_insertion(original_tour, num_original_tour, distances, cities, num_cities, k, &fo);
-            
-            if (improved_tour != NULL) {
+            local_search_tour = local_search_insertion(original_tour, num_original_tour, distances, cities, num_cities, num_random_cities, &fo);
+
+            if (local_search_tour != NULL) {
                 free(original_tour);
-                original_tour = improved_tour;
+                original_tour = local_search_tour;
                 num_original_tour = num_original_tour + 1;
                 printf("RESULTADO FINAL APÓS BUSCA LOCAL\n");
                 printf("Tour final: ");
