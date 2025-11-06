@@ -4,7 +4,8 @@
 #include "../../utils/utils.h"
 #include "../../calculate/calculate.h"
 
-void local_search_insertion(int **tour, unsigned int *tour_size, int **distances, city *cities, unsigned int num_cities, float *fo);
-void local_search_iterative(int **tour, unsigned int *tour_size, int **distances, city *cities, unsigned int num_cities, float *fo, unsigned int max_iterations);
+int* copy_tour(int *tour, unsigned int tour_size);
+bool is_city_in_tour(int city, int *tour, unsigned int tour_size);
+int* local_search_insertion(int *current_tour, unsigned int current_tour_size, int **distances, city *cities, unsigned int num_cities, unsigned int k, float *best_fo);
 
 #endif

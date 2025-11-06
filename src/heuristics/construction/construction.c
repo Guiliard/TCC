@@ -4,7 +4,7 @@ unsigned int random_city(unsigned int num_cities) {
     return (rand() % (num_cities - 1)) + 1;
 }
 
-void build_initial_solution(city **cities, unsigned int *num_cities, unsigned int *prize_goal, city **initial_solution, unsigned int *num_initial_solution) {
+void build_initial_solution(city **cities, unsigned int *num_cities, unsigned int *prize_goal, city **initial_solution, unsigned int *num_initial_solution, unsigned int *num_original_tour) {
     unsigned int total_prize = 0, count = 1,capacity = *prize_goal;
     bool *visited = allocate_vector(sizeof(bool), *num_cities);
     city *temp_solution = allocate_vector(sizeof(city), *num_cities);
@@ -31,4 +31,5 @@ void build_initial_solution(city **cities, unsigned int *num_cities, unsigned in
 
     *initial_solution = solution;
     *num_initial_solution = count;
+    *num_original_tour = count + 1;
 }

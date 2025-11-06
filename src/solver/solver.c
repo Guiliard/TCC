@@ -2,7 +2,7 @@
 
 int* solve_tsp_with_concorde(int **symmetric_distances, unsigned int num_nodes, double *optval) {
     CCdatagroup dat;
-    int *tour = (int *)malloc(num_nodes * sizeof(int));
+    int *tour = (int *)allocate_vector(sizeof(int), num_nodes);
     int success, foundtour;
     char *name = "my_tsp";
     double timebound = 3600.0;
@@ -33,8 +33,6 @@ int* solve_tsp_with_concorde(int **symmetric_distances, unsigned int num_nodes, 
         }
     }
 
-    printf("Número de arestas na lista: %d\n", ecount);
-    
     if (CCutil_graph2dat_matrix((int)num_nodes, ecount, elist, elen, 0, &dat) != 0) {
         fprintf(stderr, "Erro na conversão da matriz para CCdatagroup\n");
         free(adj);
@@ -51,12 +49,6 @@ int* solve_tsp_with_concorde(int **symmetric_distances, unsigned int num_nodes, 
     if (result == 0 && foundtour) {
         printf("SOLUÇÃO ENCONTRADA!\n");
         printf("Valor ótimo: %.2f\n", *optval);
-        printf("Tour: ");
-        for (unsigned int i = 0; i < num_nodes; i++) {
-            printf("%d ", tour[i]);
-        }
-        printf("\n");
-
     } else {
         printf("Não foi possível encontrar uma solução ótima.\n");
         printf("Success: %d, Foundtour: %d\n", success, foundtour);

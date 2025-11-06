@@ -5,7 +5,7 @@ int* convert_to_assymmetric(int *tour, unsigned int tour_size, unsigned int num_
     
     int start_index = -1;
     for (unsigned int i = 0; i < tour_size; i++) {
-        if ((unsigned int)tour[i] < num_cities) {
+        if (tour[i] == 0) {
             start_index = i;
             break;
         }
@@ -16,7 +16,7 @@ int* convert_to_assymmetric(int *tour, unsigned int tour_size, unsigned int num_
         return NULL;
     }
     
-    int *original_tour = (int *)allocate_vector(sizeof(int), num_cities);
+    int *original_tour = (int *)allocate_vector(sizeof(int), num_cities + 1);
     bool *visited = (bool *)allocate_vector(sizeof(bool), num_cities);
     int original_count = 0;
     
@@ -25,18 +25,18 @@ int* convert_to_assymmetric(int *tour, unsigned int tour_size, unsigned int num_
         int node = tour[current_index];
         
         unsigned int solution_index;
-        if ((unsigned int)node < num_cities) {
+        if (node < (int)num_cities) {
             solution_index = node;
         } else {
             solution_index = node - num_cities;
         }
         
-        if (!visited[solution_index]) {
+        if (solution_index < num_cities && !visited[solution_index]) {
             int original_city_index = initial_solution[solution_index].index_city;
             original_tour[original_count++] = original_city_index;
             visited[solution_index] = true;
             
-            printf("Nó %d -> Posição %u na solução -> Cidade original %d\n", 
+            printf("Node simétrico %d -> Solução index %d -> Cidade original %d\n", 
                    node, solution_index, original_city_index);
             
             if ((unsigned int)original_count >= num_cities) {
@@ -44,15 +44,8 @@ int* convert_to_assymmetric(int *tour, unsigned int tour_size, unsigned int num_
             }
         }
     }
-    
-    printf("Tour com índices originais: ");
-    for (int i = 0; i < original_count; i++) {
-        printf("%d", original_tour[i]);
-        if (i < original_count - 1) {
-            printf(" → ");
-        }
-    }
-    printf("\n");
+
+    original_tour[original_count] = original_tour[0];
     
     free(visited);
 

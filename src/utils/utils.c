@@ -42,3 +42,14 @@ void print_matrix(int **matrix, unsigned int num_rows, unsigned int num_cols) {
         printf("\n");
     }
 }
+
+void print_tour(int *tour, unsigned int tour_size) {
+    printf("Tour: ");
+    for (unsigned int i = 0; i < tour_size; i++) {
+        printf("%d", tour[i]);
+        if (i < tour_size - 1) {
+            printf(" → ");
+        }
+    }
+    printf("\n");
+}

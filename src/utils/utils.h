@@ -20,5 +20,6 @@ int **allocate_matrix(unsigned int num_rows, unsigned int num_cols);
 
 void print_cities(city *cities, unsigned int num_cities);
 void print_matrix(int **matrix, unsigned int num_rows, unsigned int num_cols);
+void print_tour(int *tour, unsigned int tour_size);
 
 #endif
