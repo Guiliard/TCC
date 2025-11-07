@@ -61,19 +61,3 @@ unsigned short int count_lines(char *file) {
 
     return count; 
 }
-
-unsigned short int count_tokens_in_line(char *line) {
-    unsigned short int count = 0;
-
-    char* line_copy = strdup(line);
-
-    char *token = strtok(line_copy, " "); 
-
-    while (token != NULL) {
-        count++; 
-        token = strtok(NULL, " "); 
-    }
-
-    free(line_copy);
-    return count; 
-}
