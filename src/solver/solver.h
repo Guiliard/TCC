@@ -5,6 +5,6 @@
 #include "../../concorde/concorde.h"
 #include "../../concorde/INCLUDE/util.h"
 
-int* solve_tsp_with_concorde(int **symmetric_distances, unsigned int num_nodes, double *optval);
+void solve_tsp_with_concorde(unsigned int num_nodes, int **symmetric_distances, int** tour, double *optval);
 
 #endif

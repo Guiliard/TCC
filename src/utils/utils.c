@@ -18,7 +18,7 @@ int **allocate_matrix(unsigned int num_rows, unsigned int num_cols)
     }
 
     for (unsigned int i = 0; i < num_rows; i++) {
-        matrix[i] = calloc(num_cols, sizeof(float));
+        matrix[i] = calloc(num_cols, sizeof(int));
         if (matrix[i] == NULL) {
             printf("Memory allocation failed\n");
             exit(1);
@@ -34,7 +34,7 @@ void print_cities(city *cities, unsigned int num_cities) {
     printf("\n");
 }
 
-void print_matrix(int **matrix, unsigned int num_rows, unsigned int num_cols) {
+void print_matrix(unsigned int num_rows, unsigned int num_cols, int **matrix) {
     for (unsigned int i = 0; i < num_rows; i++) {
         for (unsigned int j = 0; j < num_cols; j++) {
             printf("[%d]\t", matrix[i][j]);
@@ -43,7 +43,7 @@ void print_matrix(int **matrix, unsigned int num_rows, unsigned int num_cols) {
     }
 }
 
-void print_tour(int *tour, unsigned int tour_size) {
+void print_tour(unsigned int tour_size, int *tour) {
     printf("Tour: ");
     for (unsigned int i = 0; i < tour_size; i++) {
         printf("%d", tour[i]);

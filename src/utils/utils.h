@@ -19,7 +19,7 @@ void *allocate_vector(size_t element_size, size_t count);
 int **allocate_matrix(unsigned int num_rows, unsigned int num_cols);
 
 void print_cities(city *cities, unsigned int num_cities);
-void print_matrix(int **matrix, unsigned int num_rows, unsigned int num_cols);
-void print_tour(int *tour, unsigned int tour_size);
+void print_matrix(unsigned int num_rows, unsigned int num_cols, int **matrix);
+void print_tour(unsigned int tour_size, int *tour);
 
 #endif

@@ -4,6 +4,6 @@
 #include "../utils/utils.h"
 #include "../calculate/calculate.h"
 
-void convert_tour_to_min_cost(int *tour, unsigned int tour_size, int **distances);
+void convert_tour_to_min_cost(unsigned int tour_size, int **assymmetric_distances, int *tour);
 
 #endif

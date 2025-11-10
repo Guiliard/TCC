@@ -4,6 +4,6 @@
 #include "../utils/utils.h"
 #include "../reader/reader.h"
 
-void init_environment(char *path, city **cities, int ***distances, unsigned int *num_cities, float percent, unsigned int *prize_goal);
+void init_environment(char *path_of_file, city **all_cities, unsigned int *num_all_cities, unsigned int *prize_goal, int ***assymmetric_distances,float percent_of_prize_goal);
 
 #endif

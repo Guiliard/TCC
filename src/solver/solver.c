@@ -1,8 +1,8 @@
 #include "solver.h"
 
-int* solve_tsp_with_concorde(int **symmetric_distances, unsigned int num_nodes, double *optval) {
+void solve_tsp_with_concorde(unsigned int num_nodes, int **symmetric_distances, int** tour, double *optval) {
     CCdatagroup dat;
-    int *tour = (int *)allocate_vector(sizeof(int), num_nodes);
+    int *tour_concorde = (int *)allocate_vector(sizeof(int), num_nodes);
     int success, foundtour;
     char *name = "my_tsp";
     double timebound = 3600.0;
@@ -44,7 +44,7 @@ int* solve_tsp_with_concorde(int **symmetric_distances, unsigned int num_nodes, 
 
     CCutil_sprand(42, &rstate);
     
-    int result = CCtsp_solve_dat((int)num_nodes, &dat, NULL, tour, NULL, optval, &success, &foundtour, name, &timebound, &hit_timebound, silent, &rstate);
+    int result = CCtsp_solve_dat((int)num_nodes, &dat, NULL, tour_concorde, NULL, optval, &success, &foundtour, name, &timebound, &hit_timebound, silent, &rstate);
 
     if (result == 0 && foundtour) {
         printf("SOLUÇÃO ENCONTRADA!\n");
@@ -57,6 +57,5 @@ int* solve_tsp_with_concorde(int **symmetric_distances, unsigned int num_nodes, 
     free(adj);
     free(elist);
     free(elen);
-
-    return tour;
+    *tour = tour_concorde;
 }

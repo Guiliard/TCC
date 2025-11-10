@@ -1,6 +1,6 @@
 #include "symmetric.h"
 
-void convert_to_symmetric(int ***distances, city *initial_solution, unsigned int num_initial_solution, int ***symmetric_distances) {
+void convert_to_symmetric(city *initial_solution, unsigned int num_initial_solution, int ***assymmetric_distances, int ***symmetric_distances) {
     unsigned int n = num_initial_solution;
     unsigned int new_size = 2 * n;
     unsigned int idx_i, idx_j;
@@ -23,10 +23,10 @@ void convert_to_symmetric(int ***distances, city *initial_solution, unsigned int
             idx_j = initial_solution[j].index_city;
 
             // i -> j_linha = i -> j
-            (*symmetric_distances)[i][j + n] = (*distances)[idx_i][idx_j];
+            (*symmetric_distances)[i][j + n] = (*assymmetric_distances)[idx_i][idx_j];
             
             // i_linha -> j = j -> i
-            (*symmetric_distances)[i + n][j] = (*distances)[idx_j][idx_i];
+            (*symmetric_distances)[i + n][j] = (*assymmetric_distances)[idx_j][idx_i];
         }
         
         (*symmetric_distances)[i][i + n] = 0;

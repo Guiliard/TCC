@@ -3,6 +3,6 @@
 
 #include "../utils/utils.h"
 
-int* convert_to_assymmetric(int *tour, unsigned int tour_size, unsigned int num_cities, city *initial_solution);
+void convert_to_assymmetric(city *initial_solution, unsigned int tour_size, unsigned int num_all_cities, int **tour);
 
 #endif
