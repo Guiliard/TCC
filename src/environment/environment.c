@@ -1,5 +1,61 @@
 #include "environment.h"
 
+int compare_desc(const void *a, const void *b) {
+    int int_a = *((int*)a);
+    int int_b = *((int*)b);
+    
+    if (int_a < int_b) return 1;
+    if (int_a > int_b) return -1;
+    return 0;
+}
+
+float initialize_alpha(int **assymmetric_distances, unsigned int num_all_cities, unsigned int n) {
+    float total_sum = 0.0;
+    
+    for (unsigned int i = 0; i < num_all_cities; i++) {
+        for (unsigned int j = 0; j < num_all_cities; j++) {
+            if (i != j) {
+                total_sum += assymmetric_distances[i][j];
+            }
+        }
+    }
+    
+    printf("Soma total de todos os custos: %.2f\n", total_sum);
+    
+    unsigned int total_elements = num_all_cities * (num_all_cities - 1);
+    int *all_distances = (int *)allocate_vector(sizeof(int), total_elements);
+    
+    unsigned int index = 0;
+    for (unsigned int i = 0; i < num_all_cities; i++) {
+        for (unsigned int j = 0; j < num_all_cities; j++) {
+            if (i != j) {
+                all_distances[index++] = assymmetric_distances[i][j];
+            }
+        }
+    }
+    
+    qsort(all_distances, total_elements, sizeof(int), compare_desc);
+    
+    float sum_n_largest = 0.0;
+    unsigned int count = (n < total_elements) ? n : total_elements;
+    
+    printf("As %u maiores distâncias: ", count);
+    for (unsigned int i = 0; i < count; i++) {
+        sum_n_largest += all_distances[i];
+        printf("%d", all_distances[i]);
+        if (i < count - 1) printf(", ");
+    }
+    printf("\n");
+    
+    free(all_distances);
+    
+    float alpha = total_sum + sum_n_largest;
+    
+    printf("Alpha = %.2f (soma total) + %.2f (%u maiores) = %.2f\n", total_sum, sum_n_largest, n, alpha);
+    
+    return alpha;
+}
+
 void init_environment(char *path_of_file, city **all_cities, unsigned int *num_all_cities, unsigned int *prize_goal, int ***assymmetric_distances, float percent_of_prize_goal) {
     char *content[] = {"_N", "_P", "_w100", "_C"};
     char filenames[4][25];
