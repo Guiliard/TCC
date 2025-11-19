@@ -149,3 +149,58 @@ void random_drop(unsigned int tour_size, int **tour) {
     free(*tour);
     *tour = new_tour;
 }
+
+void best_swap(city *all_cities, unsigned int num_all_cities, unsigned int tour_size, int **tour, int **assymmetric_distances, float alpha, unsigned int prize_goal) {
+    
+    printf("Tour atual: ");
+    for (unsigned int i = 0; i < tour_size; i++) {
+        printf("%d", (*tour)[i]);
+        if (i < tour_size - 1) printf(" → ");
+    }
+    printf("\n");
+    
+    float best_fo = calculate_objective_function(all_cities, tour_size, num_all_cities, prize_goal, assymmetric_distances, *tour, alpha);
+    
+    int *best_tour = (int *)allocate_vector(sizeof(int), tour_size);
+    for (unsigned int i = 0; i < tour_size; i++) {
+        best_tour[i] = (*tour)[i];
+    }
+    
+    bool improvement_found = false;
+    
+    for (unsigned int i = 1; i < tour_size - 2; i++) {
+        for (unsigned int j = i + 1; j < tour_size - 1; j++) {
+            
+            int *new_tour = (int *)allocate_vector(sizeof(int), tour_size);
+            for (unsigned int k = 0; k < tour_size; k++) {
+                new_tour[k] = (*tour)[k];
+            }
+            
+            int temp = new_tour[i];
+            new_tour[i] = new_tour[j];
+            new_tour[j] = temp;
+            
+            float new_fo = calculate_objective_function(all_cities, tour_size, num_all_cities, prize_goal, assymmetric_distances, new_tour, alpha);
+            
+            if (new_fo < best_fo) {
+                best_fo = new_fo;
+                for (unsigned int k = 0; k < tour_size; k++) {
+                    best_tour[k] = new_tour[k];
+                }
+                improvement_found = true;
+            }
+            
+            free(new_tour);
+        }
+    }
+    
+    if (improvement_found) {
+        printf("Melhoria encontrada! Nova FO: %.2f\n", best_fo);
+        
+        free(*tour);
+        *tour = best_tour;
+    } else {
+        printf("Nenhuma melhoria encontrada. Mantém tour original.\n");
+        free(best_tour);
+    }
+}

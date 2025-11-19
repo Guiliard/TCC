@@ -51,9 +51,5 @@ float calculate_objective_function(city *all_cities, unsigned int tour_size, uns
     float total_penalty = calculate_total_penalty(all_cities, tour_size, num_all_cities, tour);
     float relative_penalty = alpha * max(0, prize_goal - total_prize);
 
-    if (relative_penalty > 0) {
-        printf("Penalidade relativa aplicada: %.2f (Prêmio total: %.2f, Meta de prêmio: %u)\n", relative_penalty, total_prize, prize_goal);
-    }
-
     return cost + relative_penalty + total_penalty;
 }
