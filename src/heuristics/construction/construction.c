@@ -35,7 +35,7 @@ solution* build_initial_solution(problem *prob, double *optval) {
     sol->prize_goal = total_prize;
 
     convert_to_symmetric(prob, sol);
-    solve_tsp_with_concorde(sol, &optval);
+    solve_tsp_with_concorde(sol, optval);
     convert_to_assymmetric(sol);
     convert_tour_to_min_cost(prob, sol);
     calculate_objective_function(prob, sol);

@@ -2,7 +2,7 @@
 
 void convert_to_assymmetric(solution *sol) {
     int start_index = -1;
-    for (unsigned int i = 0; i < (sol->num_visited_cities * 2); i++) {
+    for (int i = 0; i < (sol->num_visited_cities * 2); i++) {
         if (sol->tour[i] == 0) {
             start_index = i;
             break;

@@ -2,7 +2,7 @@
 
 void convert_tour_to_min_cost(problem *prob, solution *sol) {
     int *reverse_tour = (int *)allocate_vector(sizeof(int), sol->num_visited_cities + 1);
-    for (unsigned int i = 0; i < sol->num_visited_cities + 1; i++) {
+    for (int i = 0; i < sol->num_visited_cities + 1; i++) {
         reverse_tour[i] = sol->tour[sol->num_visited_cities - i];
     }
 

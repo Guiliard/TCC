@@ -25,6 +25,8 @@ int main() {
         &optval
     );
 
+    print_solution(sol);
+
     // random_insertion(all_cities, num_all_cities, num_initial_solution + 1, &tour);
     // print_tour(num_initial_solution + 2, tour);
 
