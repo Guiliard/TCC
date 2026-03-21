@@ -1,7 +1,8 @@
 #include "solver.h"
 
-void solve_tsp_with_concorde(unsigned int num_nodes, int **symmetric_distances, int** tour, double *optval) {
+void solve_tsp_with_concorde(solution *sol, double *optval) {
     CCdatagroup dat;
+    int num_nodes = 2 * sol->num_visited_cities;
     int *tour_concorde = (int *)allocate_vector(sizeof(int), num_nodes);
     int success, foundtour;
     char *name = "my_tsp";
@@ -13,9 +14,9 @@ void solve_tsp_with_concorde(unsigned int num_nodes, int **symmetric_distances, 
     CCutil_init_datagroup(&dat);
     
     int *adj = (int *)allocate_vector(sizeof(int), num_nodes * num_nodes);
-    for (unsigned int i = 0; i < num_nodes; i++) {
-        for (unsigned int j = 0; j < num_nodes; j++) {
-            adj[i * num_nodes + j] = (i == j) ? 0 : symmetric_distances[i][j];
+    for (int i = 0; i < num_nodes; i++) {
+        for (int j = 0; j < num_nodes; j++) {
+            adj[i * num_nodes + j] = (i == j) ? 0 : sol->symmetric_distances[i][j];
         }
     }
 
@@ -24,8 +25,8 @@ void solve_tsp_with_concorde(unsigned int num_nodes, int **symmetric_distances, 
     int *elen = (int *)allocate_vector(sizeof(int), max_edges);
     int ecount = 0;
     
-    for (unsigned int i = 0; i < num_nodes; i++) {
-        for (unsigned int j = i + 1; j < num_nodes; j++) {
+    for (int i = 0; i < num_nodes; i++) {
+        for (int j = i + 1; j < num_nodes; j++) {
             elist[2 * ecount] = i;
             elist[2 * ecount + 1] = j;
             elen[ecount] = adj[i * num_nodes + j];
@@ -33,7 +34,7 @@ void solve_tsp_with_concorde(unsigned int num_nodes, int **symmetric_distances, 
         }
     }
 
-    if (CCutil_graph2dat_matrix((int)num_nodes, ecount, elist, elen, 0, &dat) != 0) {
+    if (CCutil_graph2dat_matrix(num_nodes, ecount, elist, elen, 0, &dat) != 0) {
         fprintf(stderr, "Erro na conversão da matriz para CCdatagroup\n");
         free(adj);
         free(elist);
@@ -44,7 +45,7 @@ void solve_tsp_with_concorde(unsigned int num_nodes, int **symmetric_distances, 
 
     CCutil_sprand(42, &rstate);
     
-    int result = CCtsp_solve_dat((int)num_nodes, &dat, NULL, tour_concorde, NULL, optval, &success, &foundtour, name, &timebound, &hit_timebound, silent, &rstate);
+    int result = CCtsp_solve_dat(num_nodes, &dat, NULL, tour_concorde, NULL, optval, &success, &foundtour, name, &timebound, &hit_timebound, silent, &rstate);
 
     if (result == 0 && foundtour) {
         printf("SOLUÇÃO ENCONTRADA!\n");
@@ -57,5 +58,6 @@ void solve_tsp_with_concorde(unsigned int num_nodes, int **symmetric_distances, 
     free(adj);
     free(elist);
     free(elen);
-    *tour = tour_concorde;
+
+    sol->tour = tour_concorde;
 }

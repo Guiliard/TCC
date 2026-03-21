@@ -5,6 +5,6 @@
 
 char* read_file(char *filename);
 char* get_line_of_file(char *file, int line_number);
-unsigned short int count_lines(char *file);
+int count_lines(char *file);
 
 #endif

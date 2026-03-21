@@ -1,11 +1,9 @@
 #include "assymmetric.h"
 
-void convert_to_assymmetric(city *initial_solution, unsigned int tour_size, unsigned int num_all_cities, int **tour) {
-    printf("Convertendo tour simétrico de volta para o problema original...\n");
-    
+void convert_to_assymmetric(solution *sol) {
     int start_index = -1;
-    for (unsigned int i = 0; i < tour_size; i++) {
-        if ((*tour)[i] == 0) {
+    for (unsigned int i = 0; i < (sol->num_visited_cities * 2); i++) {
+        if (sol->tour[i] == 0) {
             start_index = i;
             break;
         }
@@ -16,30 +14,27 @@ void convert_to_assymmetric(city *initial_solution, unsigned int tour_size, unsi
         return;
     }
     
-    int *original_tour = (int *)allocate_vector(sizeof(int), num_all_cities + 1);
-    bool *visited = (bool *)allocate_vector(sizeof(bool), num_all_cities);
+    int *original_tour = (int *)allocate_vector(sizeof(int), sol->num_visited_cities + 1);
+    bool *visited = (bool *)allocate_vector(sizeof(bool), sol->num_visited_cities);
     int original_count = 0;
     
-    for (unsigned int i = 0; i < tour_size; i++) {
-        unsigned int current_index = (start_index + i) % tour_size;
-        int node = (*tour)[current_index];
+    for (int i = 0; i < (sol->num_visited_cities * 2); i++) {
+        int current_index = (start_index + i) % (sol->num_visited_cities * 2);
+        int node = sol->tour[current_index];
         
-        unsigned int solution_index;
-        if (node < (int)num_all_cities) {
+        int solution_index;
+        if (node < sol->num_visited_cities) {
             solution_index = node;
         } else {
-            solution_index = node - num_all_cities;
+            solution_index = node - sol->num_visited_cities;
         }
         
-        if (solution_index < num_all_cities && !visited[solution_index]) {
-            int original_city_index = initial_solution[solution_index].index_city;
+        if (solution_index < sol->num_visited_cities && !visited[solution_index]) {
+            int original_city_index = sol->visited_cities[solution_index].id;
             original_tour[original_count++] = original_city_index;
             visited[solution_index] = true;
             
-            printf("Node simétrico %d -> Solução index %d -> Cidade original %d\n", 
-                   node, solution_index, original_city_index);
-
-            if ((unsigned int)original_count >= num_all_cities) {
+            if (original_count >= sol->num_visited_cities) {
                 break;
             }
         }
@@ -48,7 +43,7 @@ void convert_to_assymmetric(city *initial_solution, unsigned int tour_size, unsi
     original_tour[original_count] = original_tour[0];
     
     free(visited);
-    free(*tour);
+    free(sol->tour);
 
-    *tour = original_tour;
+    sol->tour = original_tour;
 }

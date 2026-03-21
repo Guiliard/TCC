@@ -27,7 +27,6 @@ char* read_file(char *filename) {
 }
 
 char* get_line_of_file(char *file, int line_number) {
-
     char* file_copy = strdup(file); 
     char *line = strtok(file_copy, "\n"); 
 
@@ -45,11 +44,9 @@ char* get_line_of_file(char *file, int line_number) {
     return line_copy;  
 }
 
-unsigned short int count_lines(char *file) {
-    unsigned short int count = 0;
-
+int count_lines(char *file) {
+    int count = 0;
     char* file_copy = strdup(file);
-
     char *line = strtok(file_copy, "\n"); 
 
     while (line != NULL) {
@@ -58,6 +55,5 @@ unsigned short int count_lines(char *file) {
     }
 
     free(file_copy);
-
     return count; 
 }

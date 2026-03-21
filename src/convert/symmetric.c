@@ -1,35 +1,35 @@
 #include "symmetric.h"
 
-void convert_to_symmetric(city *initial_solution, unsigned int num_initial_solution, int ***assymmetric_distances, int ***symmetric_distances) {
-    unsigned int n = num_initial_solution;
+void convert_to_symmetric(problem *prob, solution *sol) {
+    unsigned int n = sol->num_visited_cities;
     unsigned int new_size = 2 * n;
     unsigned int idx_i, idx_j;
 
-    *symmetric_distances = allocate_matrix(new_size, new_size);
+    sol->symmetric_distances = allocate_matrix(new_size, new_size);
 
     for (unsigned int i = 0; i < new_size; i++) {
         for (unsigned int j = 0; j < new_size; j++) {
             if (i == j)
-                (*symmetric_distances)[i][j] = 0;
+                sol->symmetric_distances[i][j] = 0;
             else
-                (*symmetric_distances)[i][j] = 9999999;
+                sol->symmetric_distances[i][j] = 9999999;
         }
     }
     
     for (unsigned int i = 0; i < n; i++) {
-        idx_i = initial_solution[i].index_city;
+        idx_i = sol->visited_cities[i].id;
 
         for (unsigned int j = 0; j < n; j++) {
-            idx_j = initial_solution[j].index_city;
+            idx_j = sol->visited_cities[j].id;
 
             // i -> j_linha = i -> j
-            (*symmetric_distances)[i][j + n] = (*assymmetric_distances)[idx_i][idx_j];
+            sol->symmetric_distances[i][j + n] = prob->assymmetric_distances[idx_i][idx_j];
             
             // i_linha -> j = j -> i
-            (*symmetric_distances)[i + n][j] = (*assymmetric_distances)[idx_j][idx_i];
+            sol->symmetric_distances[i + n][j] = prob->assymmetric_distances[idx_j][idx_i];
         }
         
-        (*symmetric_distances)[i][i + n] = 0;
-        (*symmetric_distances)[i + n][i] = 0;
+        sol->symmetric_distances[i][i + n] = 0;
+        sol->symmetric_distances[i + n][i] = 0;
     }
 }

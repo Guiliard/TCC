@@ -2,8 +2,12 @@
 #define CONSTRUCTION_H
 
 #include "../../utils/utils.h"
+#include "../../solver/solver.h"
+#include "../../convert/symmetric.h"
+#include "../../convert/assymmetric.h"
+#include "../../convert/min_cost.h"
 
-unsigned int random_city(unsigned int num_cities);
-void build_initial_solution(city **all_cities, city **initial_solution, unsigned int *num_all_cities, unsigned int *prize_goal, unsigned int *num_initial_solution);
+int random_city(int num_cities);
+solution* build_initial_solution(problem *prob, double *optval);
 
 #endif
