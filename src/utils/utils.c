@@ -59,6 +59,7 @@ void print_problem(problem *prob) {
     print_matrix(prob->num_all_cities, prob->num_all_cities, prob->assymmetric_distances);   
     printf("Número total de cidades: %d\n", prob->num_all_cities);
     printf("Prêmio total: %d\n", prob->total_prize);
+    printf("Meta de prêmio mínimo: %d\n", prob->min_prize_goal);
     printf("Percentual do prêmio a ser alcançado: %.2f%%\n", prob->percent_of_prize * 100);
     printf("Valor de alpha: %.2f\n", prob->alpha);
 }
@@ -71,13 +72,13 @@ void print_solution(solution *sol) {
     for (int i = 0; i < sol->num_visited_cities; i++) {
         printf("Cidade %d: Prêmio = %d, Penalidade = %d\n", sol->visited_cities[i].id, sol->visited_cities[i].prize, sol->visited_cities[i].penalty);
     }
-    printf("\nMatriz de Distâncias Simétrica:\n");
-    print_matrix(sol->num_visited_cities, sol->num_visited_cities, sol->symmetric_distances);
-    printf("\nTour:\n");
-    print_tour(sol->num_visited_cities, sol->tour);
+    //printf("\nMatriz de Distâncias Simétrica:\n");
+    //print_matrix(sol->num_visited_cities, sol->num_visited_cities, sol->symmetric_distances);
+    //printf("\nTour:\n");
+    //print_tour(sol->num_visited_cities, sol->tour);
     printf("Número de cidades visitadas: %d\n", sol->num_visited_cities);
     printf("Prêmio objetivo: %d\n", sol->prize_goal);
-    printf("Custo total da solução: %.2f\n", sol->total_cost);
+    //printf("Custo total da solução: %.2f\n", sol->total_cost);
 }
 
 void free_problem(problem *prob) {
