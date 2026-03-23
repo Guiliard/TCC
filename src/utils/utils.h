@@ -31,6 +31,7 @@ typedef struct solution {
     city* visited_cities;
     int** symmetric_distances;
     int* tour;
+    int tour_size;
     int num_visited_cities;
     int prize_goal;
     float total_cost;

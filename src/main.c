@@ -1,10 +1,5 @@
 #include "environment/environment.h"
 #include "heuristics/construction/construction.h"
-#include "heuristics/local_search/local_search.h"
-#include "convert/symmetric.h"
-#include "convert/assymmetric.h"
-#include "convert/min_cost.h"
-#include "solver/solver.h"
 
 int main() {
     srand(time(NULL));
@@ -19,6 +14,8 @@ int main() {
         "dataset/atex1_w100.pctsp", 
         "dataset/atex1_C.pctsp"
     );
+
+    print_problem(prob);
 
     sol = build_initial_solution(
         prob, 

@@ -42,11 +42,14 @@ solution* build_initial_solution(problem *prob, double *optval) {
 
     free(visited);
 
-    // convert_to_symmetric(prob, sol);
-    // solve_tsp_with_concorde(sol, optval);
-    // convert_to_assymmetric(sol);
-    // convert_tour_to_min_cost(prob, sol);
-    // calculate_objective_function(prob, sol);
+    convert_to_symmetric(prob, sol);
+    solve_tsp_with_concorde(sol, optval);
+    print_tour(sol->tour_size, sol->tour);
+    convert_to_assymmetric(sol);
+    print_tour(sol->tour_size, sol->tour);
+    convert_tour_to_min_cost(prob, sol);
+    print_tour(sol->tour_size, sol->tour);
+    calculate_objective_function(prob, sol);
 
     return sol;
 }

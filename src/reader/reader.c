@@ -2,13 +2,16 @@
 
 char* read_file(char *filename) {
     FILE *arq = fopen(filename, "r"); 
+
     if (arq == NULL) {
         printf("Error: opening file\n");
         exit(1);
     }
 
-    char *content = NULL;  
-    size_t length = 0;     
+    char *content = NULL;
+
+    size_t length = 0;  
+
     int ch;
 
     while ((ch = fgetc(arq)) != EOF) {
@@ -23,6 +26,7 @@ char* read_file(char *filename) {
     }
 
     fclose(arq);
+
     return content;  
 }
 
@@ -40,12 +44,15 @@ char* get_line_of_file(char *file, int line_number) {
     }
 
     char* line_copy = strdup(line);
+
     free(file_copy);
+
     return line_copy;  
 }
 
 int count_lines(char *file) {
     int count = 0;
+
     char* file_copy = strdup(file);
     char *line = strtok(file_copy, "\n"); 
 
@@ -55,5 +62,6 @@ int count_lines(char *file) {
     }
 
     free(file_copy);
+
     return count; 
 }

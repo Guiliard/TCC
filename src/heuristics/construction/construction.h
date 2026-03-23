@@ -8,6 +8,7 @@
 #include "../../convert/min_cost.h"
 
 int random_city(int num_cities);
+
 solution* build_initial_solution(problem *prob, double *optval);
 
 #endif

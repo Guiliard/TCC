@@ -2,14 +2,18 @@
 
 void solve_tsp_with_concorde(solution *sol, double *optval) {
     CCdatagroup dat;
+    CCrandstate rstate;
+
     int num_nodes = 2 * sol->num_visited_cities;
-    int *tour_concorde = (int *)allocate_vector(sizeof(int), num_nodes);
     int success, foundtour;
-    char *name = "my_tsp";
-    double timebound = 3600.0;
     int hit_timebound = 0;
     int silent = 0;
-    CCrandstate rstate;
+
+    int *tour_concorde = (int *)allocate_vector(sizeof(int), num_nodes);
+
+    char *name = "my_tsp";
+    
+    double timebound = 3600.0;
 
     CCutil_init_datagroup(&dat);
     
@@ -60,4 +64,5 @@ void solve_tsp_with_concorde(solution *sol, double *optval) {
     free(elen);
 
     sol->tour = tour_concorde;
+    sol->tour_size = num_nodes;
 }

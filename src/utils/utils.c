@@ -2,16 +2,19 @@
 
 void *allocate_vector(size_t element_size, size_t count) {
     void *vector = calloc(count, element_size);
+
     if (vector == NULL) {
         printf("Memory allocation failed\n");
         exit(1);
     }
+
     return vector;
 }
 
 int **allocate_matrix(int num_rows, int num_cols)
 {
     int **matrix = calloc(num_rows, sizeof(int *));
+
     if (matrix == NULL) {
         printf("Memory allocation failed\n");
         exit(1);
@@ -24,6 +27,7 @@ int **allocate_matrix(int num_rows, int num_cols)
             exit(1);
         }
     }
+
     return matrix;
 }
 
@@ -38,12 +42,14 @@ void print_matrix(int num_rows, int num_cols, int **matrix) {
 
 void print_tour(int tour_size, int *tour) {
     printf("Tour: ");
+
     for (int i = 0; i < tour_size; i++) {
         printf("%d", tour[i]);
         if (i < tour_size - 1) {
             printf(" → ");
         }
     }
+
     printf("\n");
 }
 
@@ -72,29 +78,29 @@ void print_solution(solution *sol) {
     for (int i = 0; i < sol->num_visited_cities; i++) {
         printf("Cidade %d: Prêmio = %d, Penalidade = %d\n", sol->visited_cities[i].id, sol->visited_cities[i].prize, sol->visited_cities[i].penalty);
     }
-    //printf("\nMatriz de Distâncias Simétrica:\n");
-    //print_matrix(sol->num_visited_cities, sol->num_visited_cities, sol->symmetric_distances);
-    //printf("\nTour:\n");
-    //print_tour(sol->num_visited_cities, sol->tour);
     printf("Número de cidades visitadas: %d\n", sol->num_visited_cities);
     printf("Prêmio objetivo: %d\n", sol->prize_goal);
-    //printf("Custo total da solução: %.2f\n", sol->total_cost);
+    printf("Custo total da solução: %.2f\n", sol->total_cost);
 }
 
 void free_problem(problem *prob) {
     free(prob->all_cities);
+
     for (int i = 0; i < prob->num_all_cities; i++) {
         free(prob->assymmetric_distances[i]);
     }
+    
     free(prob->assymmetric_distances);
     free(prob);
 }
 
 void free_solution(solution *sol) {
     free(sol->visited_cities);
+
     for (int i = 0; i < sol->num_visited_cities; i++) {
         free(sol->symmetric_distances[i]);
     }
+
     free(sol->symmetric_distances);
     free(sol->tour);
     free(sol);
