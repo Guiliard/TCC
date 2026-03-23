@@ -9,7 +9,7 @@ solution* build_initial_solution(problem *prob, double *optval) {
     
     int total_prize = 0;
     int count = 1;
-    int capacity = (int)(prob->total_prize * prob->percent_of_prize);
+    int capacity = prob->min_prize_goal;
 
     bool *visited = allocate_vector(sizeof(bool), prob->num_all_cities);
     city *solution = allocate_vector(sizeof(city), prob->num_all_cities);
