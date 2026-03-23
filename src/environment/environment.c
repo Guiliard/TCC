@@ -9,6 +9,12 @@ int compare_desc(const void *a, const void *b) {
     return 0;
 }
 
+void initialize_city_parameters(problem *prob) {
+    for (int i = 0; i < prob->num_all_cities; i++) {
+        calculate_city_parameter(prob, i);
+    }
+}
+
 void initialize_alpha(problem *prob) {
     float total_sum = 0.0;
     
@@ -98,6 +104,7 @@ problem* init_environment(char *number_file, char *prize_file, char* penalty_fil
     free(distance_content);
     
     initialize_alpha(prob);
+    initialize_city_parameters(prob);
 
     return prob;
 }

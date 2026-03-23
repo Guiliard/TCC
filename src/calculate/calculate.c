@@ -1,5 +1,27 @@
 #include "calculate.h"
 
+float calculate_average_distance(problem *prob, int city_index) {
+    float sum = 0.0;
+
+    for (int j = 0; j < prob->num_all_cities; j++) {
+        if (j != city_index) {
+            sum += prob->assymmetric_distances[city_index][j];
+        }
+    }
+
+    return sum / (prob->num_all_cities - 1);
+}
+
+float calculate_city_parameter(problem *prob, int city_index) {
+    city *c = &prob->all_cities[city_index];
+
+    c->avg_distance = calculate_average_distance(prob, city_index);
+
+    c->parameter = (c->prize * c->penalty) / c->avg_distance;
+
+    return c->parameter;
+}
+
 float calculate_tour_cost(int tour_size, int **assymmetric_distances, int *tour) {
     float cost = 0.0;
     

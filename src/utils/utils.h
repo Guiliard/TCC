@@ -15,6 +15,8 @@ typedef struct city {
 	int id;
     int prize;
     int penalty;
+    float avg_distance;
+    float parameter;
 } city;
 
 typedef struct problem {
