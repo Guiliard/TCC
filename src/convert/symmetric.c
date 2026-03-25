@@ -5,7 +5,15 @@ void convert_to_symmetric(problem *prob, solution *sol) {
     int new_size = 2 * n;
     int idx_i, idx_j;
 
+    if(sol->symmetric_distances != NULL) {
+        for (int i = 0; i < sol->symmetric_distances_size; i++) {
+            free(sol->symmetric_distances[i]);
+        }
+        free(sol->symmetric_distances);
+    }
+
     sol->symmetric_distances = allocate_matrix(new_size, new_size);
+    sol->symmetric_distances_size = new_size;
 
     for (int i = 0; i < new_size; i++) {
         for (int j = 0; j < new_size; j++) {
@@ -23,10 +31,10 @@ void convert_to_symmetric(problem *prob, solution *sol) {
             idx_j = sol->visited_cities[j].id;
 
             // i -> j_linha = i -> j
-            sol->symmetric_distances[i][j + n] = prob->assymmetric_distances[idx_i][idx_j];
+            sol->symmetric_distances[i][j + n] = prob->asymmetric_distances[idx_i][idx_j];
             
             // i_linha -> j = j -> i
-            sol->symmetric_distances[i + n][j] = prob->assymmetric_distances[idx_j][idx_i];
+            sol->symmetric_distances[i + n][j] = prob->asymmetric_distances[idx_j][idx_i];
         }
         
         sol->symmetric_distances[i][i + n] = 0;

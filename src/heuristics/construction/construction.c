@@ -4,7 +4,7 @@ void resolve_tsp_with_concorde(problem* prob, solution *sol, double *optval) {
     convert_to_symmetric(prob, sol);
     solve_tsp_with_concorde(sol, optval);
     // print_tour(sol->tour_size, sol->tour);
-    convert_to_assymmetric(sol);
+    convert_to_asymmetric(sol);
     // print_tour(sol->tour_size, sol->tour);
     convert_tour_to_min_cost(prob, sol);
     // print_tour(sol->tour_size, sol->tour);
@@ -12,21 +12,23 @@ void resolve_tsp_with_concorde(problem* prob, solution *sol, double *optval) {
 }
 
 solution* grasp(problem* prob, int max_iter, float alpha, double *optval) {
-    solution* best = NULL;
+    solution* best_sol = NULL;
 
     for (int i = 0; i < max_iter; i++) {
-        solution* sol = build_initial_solution_grasp(prob, alpha, optval);
-        vnd(prob, sol, optval);
+        solution* current_sol = build_initial_solution_grasp(prob, alpha, optval);
+        vnd(prob, current_sol, optval);
 
-        if (best == NULL || sol->total_cost < best->total_cost) {
-            if(best) free(best);
-            best = sol;
+        if (best_sol == NULL || current_sol->total_cost < best_sol->total_cost) {
+            if (best_sol != NULL) {
+                free_solution(best_sol);
+            }
+            best_sol = current_sol;
         } else {
-            free(sol);
+            free_solution(current_sol);
         }
     }
 
-    return best;
+    return best_sol;
 }
 
 solution* build_initial_solution_grasp(problem *prob, float alpha, double *optval) {
@@ -105,6 +107,10 @@ solution* build_initial_solution_grasp(problem *prob, float alpha, double *optva
     sol->visited_cities = selected;
     sol->num_visited_cities = count;
     sol->prize_goal = total_prize;
+    sol->symmetric_distances = NULL;
+    sol->symmetric_distances_size = 0;
+    sol->tour = NULL;
+    sol->tour_size = 0;
 
     resolve_tsp_with_concorde(prob, sol, optval);
 

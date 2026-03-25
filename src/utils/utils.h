@@ -23,7 +23,7 @@ typedef struct city {
 
 typedef struct problem {
     city* all_cities;
-    int** assymmetric_distances;
+    int** asymmetric_distances;
     int num_all_cities;
     int total_prize;
     int min_prize_goal;
@@ -34,6 +34,7 @@ typedef struct problem {
 typedef struct solution {
     city* visited_cities;
     int** symmetric_distances;
+    int symmetric_distances_size;
     int* tour;
     int tour_size;
     int num_visited_cities;
@@ -49,6 +50,8 @@ void print_tour(int tour_size, int *tour);
 
 void print_problem(problem *prob);
 void print_solution(solution *sol);
+
+solution* copy_solution(solution *sol);
 
 void free_problem(problem *prob);
 void free_solution(solution *sol);

@@ -7,8 +7,8 @@ void convert_tour_to_min_cost(problem *prob, solution *sol) {
         reverse_tour[i] = sol->tour[sol->tour_size - 1 - i];
     }
 
-    float cost_normal = calculate_tour_cost(sol->tour_size, prob->assymmetric_distances, sol->tour);
-    float cost_reverse = calculate_tour_cost(sol->tour_size, prob->assymmetric_distances, reverse_tour);
+    float cost_normal = calculate_tour_cost(sol->tour_size, prob->asymmetric_distances, sol->tour);
+    float cost_reverse = calculate_tour_cost(sol->tour_size, prob->asymmetric_distances, reverse_tour);
 
     printf("Tour na direção normal: %.2f", cost_normal);
     printf("\nTour na direção reversa: %.2f\n", cost_reverse);

@@ -21,7 +21,7 @@ void initialize_alpha(problem *prob) {
     for (int i = 0; i < prob->num_all_cities; i++) {
         for (int j = 0; j < prob->num_all_cities; j++) {
             if (i != j) {
-                total_sum += prob->assymmetric_distances[i][j];
+                total_sum += prob->asymmetric_distances[i][j];
             }
         }
     }
@@ -35,7 +35,7 @@ void initialize_alpha(problem *prob) {
     for (int i = 0; i < prob->num_all_cities; i++) {
         for (int j = 0; j < prob->num_all_cities; j++) {
             if (i != j) {
-                all_distances[index++] = prob->assymmetric_distances[i][j];
+                all_distances[index++] = prob->asymmetric_distances[i][j];
             }
         }
     }
@@ -72,7 +72,7 @@ problem* init_environment(char *number_file, char *prize_file, char* penalty_fil
     prob->percent_of_prize = PERCENT_OF_PRIZE;
     prob->num_all_cities = atoi(number_content);
     prob->all_cities = allocate_vector(sizeof(city), prob->num_all_cities);
-    prob->assymmetric_distances = allocate_matrix(prob->num_all_cities, prob->num_all_cities);
+    prob->asymmetric_distances = allocate_matrix(prob->num_all_cities, prob->num_all_cities);
 
     for (int i = 0; i < prob->num_all_cities; i++) {
         char *line = get_line_of_file(prize_content, i);
@@ -92,7 +92,7 @@ problem* init_environment(char *number_file, char *prize_file, char* penalty_fil
         int from, to, dist;
         char *line = get_line_of_file(distance_content, i);
         sscanf(line, "%d %d %d", &from, &to, &dist);
-        prob->assymmetric_distances[from][to] = dist;
+        prob->asymmetric_distances[from][to] = dist;
         free(line);
     }
 

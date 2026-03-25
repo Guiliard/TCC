@@ -5,7 +5,7 @@
 #include "../../solver/solver.h"
 #include "../../convert/min_cost.h"
 #include "../../convert/symmetric.h"
-#include "../../convert/assymmetric.h"
+#include "../../convert/asymmetric.h"
 #include "../local_search/local_search.h"
 
 void resolve_tsp_with_concorde(problem* prob, solution *sol, double *optval);

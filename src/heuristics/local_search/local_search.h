@@ -5,7 +5,7 @@
 #include "../../solver/solver.h"
 #include "../../convert/min_cost.h"
 #include "../../convert/symmetric.h"
-#include "../../convert/assymmetric.h"
+#include "../../convert/asymmetric.h"
 #include "../../calculate/calculate.h"
 
 int compare_parameter_asc(const void *a, const void *b);

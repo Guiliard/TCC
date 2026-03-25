@@ -62,7 +62,7 @@ void print_problem(problem *prob) {
         printf("Cidade %d: Prêmio = %d, Penalidade = %d, Distância Média = %.2f, Parâmetro = %.2f\n", prob->all_cities[i].id, prob->all_cities[i].prize, prob->all_cities[i].penalty, prob->all_cities[i].avg_distance, prob->all_cities[i].parameter);
     }
     printf("\nMatriz de Distâncias Assimétrica:\n");
-    print_matrix(prob->num_all_cities, prob->num_all_cities, prob->assymmetric_distances);   
+    print_matrix(prob->num_all_cities, prob->num_all_cities, prob->asymmetric_distances);   
     printf("Número total de cidades: %d\n", prob->num_all_cities);
     printf("Prêmio total: %d\n", prob->total_prize);
     printf("Meta de prêmio mínimo: %d\n", prob->min_prize_goal);
@@ -83,25 +83,54 @@ void print_solution(solution *sol) {
     printf("Custo total da solução: %.2f\n", sol->total_cost);
 }
 
+solution* copy_solution(solution *sol) {
+    solution *new_sol = allocate_vector(sizeof(solution), 1);
+
+    new_sol->visited_cities = allocate_vector(sizeof(city), sol->num_visited_cities);
+    
+    int sym_size = sol->symmetric_distances_size;
+    new_sol->symmetric_distances = allocate_matrix(sym_size, sym_size);
+    new_sol->symmetric_distances_size = sym_size;
+    
+    new_sol->tour = allocate_vector(sizeof(int), sol->tour_size);
+
+    memcpy(new_sol->visited_cities, sol->visited_cities, sol->num_visited_cities * sizeof(city));
+
+    for (int i = 0; i < sym_size; i++) {
+        memcpy(new_sol->symmetric_distances[i], sol->symmetric_distances[i], sym_size * sizeof(int));
+    }
+
+    memcpy(new_sol->tour, sol->tour, sol->tour_size * sizeof(int));
+
+    new_sol->tour_size = sol->tour_size;
+    new_sol->num_visited_cities = sol->num_visited_cities;
+    new_sol->prize_goal = sol->prize_goal;
+    new_sol->total_cost = sol->total_cost;
+
+    return new_sol;
+}
+
 void free_problem(problem *prob) {
     free(prob->all_cities);
 
     for (int i = 0; i < prob->num_all_cities; i++) {
-        free(prob->assymmetric_distances[i]);
+        free(prob->asymmetric_distances[i]);
     }
-    
-    free(prob->assymmetric_distances);
+
+    free(prob->asymmetric_distances);
     free(prob);
 }
 
 void free_solution(solution *sol) {
     free(sol->visited_cities);
 
-    for (int i = 0; i < sol->num_visited_cities; i++) {
-        free(sol->symmetric_distances[i]);
+    if(sol->symmetric_distances != NULL) {
+        for (int i = 0; i < sol->symmetric_distances_size; i++) {
+            free(sol->symmetric_distances[i]);
+        }
+        free(sol->symmetric_distances);
     }
 
-    free(sol->symmetric_distances);
     free(sol->tour);
     free(sol);
 }
