@@ -1,13 +1,21 @@
-// #ifndef LOCAL_SEARCH_H
-// #define LOCAL_SEARCH_H
+#ifndef LOCAL_SEARCH_H
+#define LOCAL_SEARCH_H
 
-// #include "../../utils/utils.h"
-// #include "../../calculate/calculate.h"
+#include "../../utils/utils.h"
+#include "../../solver/solver.h"
+#include "../../convert/min_cost.h"
+#include "../../convert/symmetric.h"
+#include "../../convert/assymmetric.h"
+#include "../../calculate/calculate.h"
 
-// bool is_city_in_tour(int city, int *tour, unsigned int tour_size);
-// void random_insertion(city *all_cities, unsigned int num_all_cities, unsigned int tour_size, int **tour);
-// void random_swap(city *all_cities, unsigned int num_all_cities, unsigned int tour_size, int **tour);
-// void random_drop(unsigned int tour_size, int **tour);
-// void best_swap(city *all_cities, unsigned int num_all_cities, unsigned int tour_size, int **tour, int **assymmetric_distances, float alpha, unsigned int prize_goal);
+int compare_parameter_asc(const void *a, const void *b);
+int compare_parameter_desc(const void *a, const void *b);
 
-// #endif
+bool try_solution(problem *prob, solution *sol, double *optval, float original_cost);
+
+void insertion_move(problem* prob, solution* sol, double* optval);
+void drop_move(problem* prob, solution* sol, double* optval);
+void swap_move(problem* prob, solution* sol, double* optval);
+void vnd(problem* prob, solution* sol, double* optval);
+
+#endif

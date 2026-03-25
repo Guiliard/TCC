@@ -17,50 +17,14 @@ int main() {
 
     print_problem(prob);
 
-    sol = build_initial_solution(
-        prob, 
+    sol = grasp(
+        prob,
+        MAX_ITER,
+        ALPHA,
         &optval
     );
 
     print_solution(sol);
-
-    // random_insertion(all_cities, num_all_cities, num_initial_solution + 1, &tour);
-    // print_tour(num_initial_solution + 2, tour);
-
-    // fo = calculate_objective_function(all_cities, num_initial_solution + 2, num_all_cities, prize_goal, assymmetric_distances, tour, alpha);
-    // printf("Valor da função objetivo após inserção aleatória: %.2f\n", fo);
-
-    // random_swap(all_cities, num_all_cities, num_initial_solution + 2, &tour);
-    // print_tour(num_initial_solution + 2, tour);
-
-    // fo = calculate_objective_function(all_cities, num_initial_solution + 2, num_all_cities, prize_goal, assymmetric_distances, tour, alpha);
-    // printf("Valor da função objetivo após troca simples: %.2f\n", fo);
-
-    // random_drop(num_initial_solution + 2, &tour);
-    // print_tour(num_initial_solution + 1, tour);
-
-    // fo = calculate_objective_function(all_cities, num_initial_solution + 1, num_all_cities, prize_goal, assymmetric_distances, tour, alpha);
-    // printf("Valor da função objetivo após remoção aleatória: %.2f\n", fo);
-
-    // best_swap(all_cities, num_all_cities, num_initial_solution + 1, &tour, assymmetric_distances, alpha, prize_goal);
-    // print_tour(num_initial_solution + 1, tour);
-
-    // fo = calculate_objective_function(all_cities, num_initial_solution + 1, num_all_cities, prize_goal, assymmetric_distances, tour, alpha);
-    // printf("Valor da função objetivo após melhor troca: %.2f\n", fo);
-
-    // free(tour);
-    // free(initial_solution);
-    // free(all_cities);
-    
-    // for (unsigned int i = 0; i < num_all_cities; i++) {
-    //     free(assymmetric_distances[i]);
-    // }
-    // free(assymmetric_distances);
-    
-    // for (unsigned int i = 0; i < 2 * num_initial_solution; i++) {
-    //     free(symmetric_distances[i]);
-    // }
-    // free(symmetric_distances);
     
     return 0;
 }

@@ -3,12 +3,14 @@
 
 #include "../../utils/utils.h"
 #include "../../solver/solver.h"
+#include "../../convert/min_cost.h"
 #include "../../convert/symmetric.h"
 #include "../../convert/assymmetric.h"
-#include "../../convert/min_cost.h"
+#include "../local_search/local_search.h"
 
-int random_city(int num_cities);
+void resolve_tsp_with_concorde(problem* prob, solution *sol, double *optval);
 
-solution* build_initial_solution(problem *prob, double *optval);
+solution* grasp(problem *prob, int max_iter, float alpha, double *optval);
+solution* build_initial_solution_grasp(problem *prob, float alpha, double *optval);
 
 #endif

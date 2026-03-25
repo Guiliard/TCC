@@ -10,6 +10,8 @@
 #define FLT_MAX	__FLT_MAX__
 
 #define PERCENT_OF_PRIZE 0.2
+#define MAX_ITER 1
+#define ALPHA 0.1f
 
 typedef struct city {
 	int id;

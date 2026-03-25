@@ -1,5 +1,13 @@
 #include "calculate.h"
 
+float calculate_greedy_value(problem *prob, int last_city, int candidate_city) {
+    float distance = prob->assymmetric_distances[last_city][candidate_city];
+
+    city *c = &prob->all_cities[candidate_city];
+
+    return (c->prize + c->penalty) / distance;
+}
+
 float calculate_average_distance(problem *prob, int city_index) {
     float sum = 0.0;
 

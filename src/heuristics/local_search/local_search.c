@@ -1,206 +1,275 @@
-// #include "local_search.h"
+#include "local_search.h"
 
-// bool is_city_in_tour(int city, int *tour, unsigned int tour_size) {
-//     for (unsigned int i = 0; i < tour_size; i++) {
-//         if (tour[i] == city) {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
+problem *global_prob;
 
-// void random_insertion(city *all_cities, unsigned int num_all_cities, unsigned int tour_size, int **tour) {    
-//     int *unvisited_cities = NULL;
-//     unsigned int num_unvisited = 0;
-    
-//     for (unsigned int i = 0; i < num_all_cities; i++) {
-//         if (!is_city_in_tour(all_cities[i].index_city, *tour, tour_size)) {
-//             num_unvisited++;
-//         }
-//     }
-    
-//     unvisited_cities = (int *)allocate_vector(sizeof(int), num_unvisited);
-   
-//     unsigned int index = 0;
-//     for (unsigned int i = 0; i < num_all_cities; i++) {
-//         if (!is_city_in_tour(all_cities[i].index_city, *tour, tour_size)) {
-//             unvisited_cities[index++] = all_cities[i].index_city;
-//         }
-//     }
-    
-//     printf("Cidades não visitadas disponíveis: %u\n", num_unvisited);
-    
-//     unsigned int random_city_index = rand() % num_unvisited;
-//     int city_to_insert = unvisited_cities[random_city_index];
-    
-//     unsigned int min_position = 1;
-//     unsigned int max_position = tour_size - 1;
-//     unsigned int random_position = min_position + (rand() % (max_position - min_position + 1));
-    
-//     printf("Inserindo cidade %d na posição %d\n", city_to_insert, random_position);
-//     printf("Tour antes: ");
-//     for (unsigned int i = 0; i < tour_size; i++) {
-//         printf("%d", (*tour)[i]);
-//         if (i < tour_size - 1) printf(" → ");
-//     }
-//     printf("\n");
-    
-//     int *new_tour = (int *)allocate_vector(sizeof(int), tour_size + 1);
-    
-//     for (unsigned int i = 0; i < random_position; i++) {
-//         new_tour[i] = (*tour)[i];
-//     }
-//     new_tour[random_position] = city_to_insert;
-//     for (unsigned int i = random_position; i < tour_size; i++) {
-//         new_tour[i + 1] = (*tour)[i];
-//     }
-    
-//     free(*tour);
-//     *tour = new_tour;
-    
-//     free(unvisited_cities);
-// }
+int compare_parameter_asc(const void *a, const void *b)
+{
+    int city_a = *(int*)a;
+    int city_b = *(int*)b;
 
-// void random_swap(city *all_cities, unsigned int num_all_cities, unsigned int tour_size, int **tour) {
-//     int *unvisited_cities = NULL;
-//     unsigned int num_unvisited = 0;
-    
-//     for (unsigned int i = 0; i < num_all_cities; i++) {
-//         if (!is_city_in_tour(all_cities[i].index_city, *tour, tour_size)) {
-//             num_unvisited++;
-//         }
-//     }
-    
-//     unvisited_cities = (int *)allocate_vector(sizeof(int), num_unvisited);
-    
-//     unsigned int index = 0;
-//     for (unsigned int i = 0; i < num_all_cities; i++) {
-//         if (!is_city_in_tour(all_cities[i].index_city, *tour, tour_size)) {
-//             unvisited_cities[index++] = all_cities[i].index_city;
-//         }
-//     }
-    
-//     printf("Cidades não visitadas disponíveis: %u\n", num_unvisited);
-    
-//     unsigned int random_unvisited_index = rand() % num_unvisited;
-//     int city_to_insert = unvisited_cities[random_unvisited_index];
-    
-//     unsigned int min_position = 1;
-//     unsigned int max_position = tour_size - 2;
-//     unsigned int random_position = min_position + (rand() % (max_position - min_position + 1));
-    
-//     int city_to_remove = (*tour)[random_position];
-    
-//     printf("Trocando cidade %d (posição %d) por cidade %d\n", city_to_remove, random_position, city_to_insert);
-//     printf("Tour antes: ");
-//     for (unsigned int i = 0; i < tour_size; i++) {
-//         printf("%d", (*tour)[i]);
-//         if (i < tour_size - 1) printf(" → ");
-//     }
-//     printf("\n");
-    
-//     int *new_tour = (int *)allocate_vector(sizeof(int), tour_size);
-    
-//     for (unsigned int i = 0; i < tour_size; i++) {
-//         if (i == random_position) {
-//             new_tour[i] = city_to_insert;
-//         } else {
-//             new_tour[i] = (*tour)[i];
-//         }
-//     }
-    
-//     free(*tour);
-//     *tour = new_tour;
-    
-//     free(unvisited_cities);
-// }
+    float pa = global_prob->all_cities[city_a].parameter;
+    float pb = global_prob->all_cities[city_b].parameter;
 
-// void random_drop(unsigned int tour_size, int **tour) {
-//     if (tour_size <= 3) {
-//         printf("Tour muito pequeno para remover cidades. Tamanho atual: %u\n", tour_size);
-//         return;
-//     }
+    if (pa > pb) return 1;
+    if (pa < pb) return -1;
 
-//     printf("Tour atual: ");
-//     for (unsigned int i = 0; i < tour_size; i++) {
-//         printf("%d", (*tour)[i]);
-//         if (i < tour_size - 1) printf(" → ");
-//     }
-//     printf("\n");
+    return 0;
+}
 
-//     unsigned int min_position = 1;
-//     unsigned int max_position = tour_size - 2;
-//     unsigned int random_position = min_position + (rand() % (max_position - min_position + 1));
-    
-//     int city_to_remove = (*tour)[random_position];
-    
-//     printf("Removendo cidade %d da posição %d\n", city_to_remove, random_position);
+int compare_parameter_desc(const void *a, const void *b)
+{
+    int city_a = *(int*)a;
+    int city_b = *(int*)b;
 
-//     int *new_tour = (int *)allocate_vector(sizeof(int), tour_size - 1);
-    
-//     for (unsigned int i = 0; i < random_position; i++) {
-//         new_tour[i] = (*tour)[i];
-//     }
-    
-//     for (unsigned int i = random_position + 1; i < tour_size; i++) {
-//         new_tour[i - 1] = (*tour)[i];
-//     }
-    
-//     free(*tour);
-//     *tour = new_tour;
-// }
+    float pa = global_prob->all_cities[city_a].parameter;
+    float pb = global_prob->all_cities[city_b].parameter;
 
-// void best_swap(city *all_cities, unsigned int num_all_cities, unsigned int tour_size, int **tour, int **assymmetric_distances, float alpha, unsigned int prize_goal) {
+    if (pa < pb) return 1;
+    if (pa > pb) return -1;
+
+    return 0;
+}
+
+bool try_solution(problem *prob, solution *sol, double *optval, float original_cost)
+{
+    convert_to_symmetric(prob, sol);
+    solve_tsp_with_concorde(sol, optval);
+    convert_to_assymmetric(sol);
+    convert_tour_to_min_cost(prob, sol);
+    calculate_objective_function(prob, sol);
+
+    return sol->total_cost < original_cost;
+}
+
+void insertion_move(problem *prob, solution *sol, double *optval)
+{
+    bool *in_solution = allocate_vector(sizeof(bool), prob->num_all_cities);
+
+    for(int i = 0; i < prob->num_all_cities; i++) {
+        in_solution[i] = false;
+    }
+
+    for(int i = 0; i < sol->num_visited_cities; i++) {
+        in_solution[sol->visited_cities[i].id] = true;
+    }
+
+    int *candidates = allocate_vector(sizeof(int), prob->num_all_cities - sol->num_visited_cities);
+    int num_candidates = 0;
+
+    for(int i = 0; i < prob->num_all_cities; i++) {
+        if(!in_solution[i]) {
+            candidates[num_candidates++] = i;
+        }
+    }
+
+    global_prob = prob;
+
+    qsort(candidates, num_candidates, sizeof(int), compare_parameter_desc);
+
+    float original_cost = sol->total_cost;
     
-//     printf("Tour atual: ");
-//     for (unsigned int i = 0; i < tour_size; i++) {
-//         printf("%d", (*tour)[i]);
-//         if (i < tour_size - 1) printf(" → ");
-//     }
-//     printf("\n");
-    
-//     float best_fo = calculate_objective_function(all_cities, tour_size, num_all_cities, prize_goal, assymmetric_distances, *tour, alpha);
-    
-//     int *best_tour = (int *)allocate_vector(sizeof(int), tour_size);
-//     for (unsigned int i = 0; i < tour_size; i++) {
-//         best_tour[i] = (*tour)[i];
-//     }
-    
-//     bool improvement_found = false;
-    
-//     for (unsigned int i = 1; i < tour_size - 2; i++) {
-//         for (unsigned int j = i + 1; j < tour_size - 1; j++) {
-            
-//             int *new_tour = (int *)allocate_vector(sizeof(int), tour_size);
-//             for (unsigned int k = 0; k < tour_size; k++) {
-//                 new_tour[k] = (*tour)[k];
-//             }
-            
-//             int temp = new_tour[i];
-//             new_tour[i] = new_tour[j];
-//             new_tour[j] = temp;
-            
-//             float new_fo = calculate_objective_function(all_cities, tour_size, num_all_cities, prize_goal, assymmetric_distances, new_tour, alpha);
-            
-//             if (new_fo < best_fo) {
-//                 best_fo = new_fo;
-//                 for (unsigned int k = 0; k < tour_size; k++) {
-//                     best_tour[k] = new_tour[k];
-//                 }
-//                 improvement_found = true;
-//             }
-            
-//             free(new_tour);
-//         }
-//     }
-    
-//     if (improvement_found) {
-//         printf("Melhoria encontrada! Nova FO: %.2f\n", best_fo);
-        
-//         free(*tour);
-//         *tour = best_tour;
-//     } else {
-//         printf("Nenhuma melhoria encontrada. Mantém tour original.\n");
-//         free(best_tour);
-//     }
-// }
+    int old_size = sol->num_visited_cities;
+
+    sol->visited_cities = realloc(sol->visited_cities, (old_size + 1) * sizeof(city));
+
+    for(int c = 0; c < num_candidates; c++) {
+        int city_id = candidates[c];
+
+        sol->visited_cities[old_size] = prob->all_cities[city_id];
+        sol->num_visited_cities = old_size + 1;
+
+        if(try_solution(prob, sol, optval, original_cost)) {
+            free(in_solution);
+            free(candidates);
+            return;
+        }
+    }
+
+    sol->visited_cities = realloc(sol->visited_cities, old_size * sizeof(city));
+    sol->num_visited_cities = old_size;
+
+    free(in_solution);
+    free(candidates);
+}
+
+void drop_move(problem *prob, solution *sol, double *optval)
+{
+    if(sol->num_visited_cities <= 1) {
+        return;
+    }
+
+    int *candidates = allocate_vector(sizeof(int), sol->num_visited_cities);
+    int num_candidates = 0;
+
+    int current_prize = sol->prize_goal;
+
+    for(int i = 1; i < sol->num_visited_cities; i++) {
+        int new_prize = current_prize - sol->visited_cities[i].prize;
+
+        if(new_prize >= prob->min_prize_goal) {
+            candidates[num_candidates++] = sol->visited_cities[i].id;
+        }
+    }
+
+    if(num_candidates == 0) {
+        free(candidates);
+        return;
+    }
+
+    global_prob = prob;
+
+    qsort(candidates, num_candidates, sizeof(int), compare_parameter_asc);
+
+    float original_cost = sol->total_cost;
+
+    int old_size = sol->num_visited_cities;
+
+    for(int c = 0; c < num_candidates; c++) {
+        int city_id = candidates[c];
+
+        int remove_index = -1;
+
+        for(int k = 1; k < sol->num_visited_cities; k++) {
+            if(sol->visited_cities[k].id == city_id) {
+                remove_index = k;
+                break;
+            }
+        }
+
+        if(remove_index == -1) continue;
+
+        city removed = sol->visited_cities[remove_index];
+
+        for(int i = remove_index; i < old_size - 1; i++) {
+            sol->visited_cities[i] = sol->visited_cities[i+1];
+        }
+
+        sol->num_visited_cities = old_size - 1;
+        sol->prize_goal -= removed.prize;
+
+        if(try_solution(prob, sol, optval, original_cost)) {
+            sol->visited_cities = realloc(sol->visited_cities, sol->num_visited_cities * sizeof(city));
+            free(candidates);
+            return;
+        }
+
+        for(int i = old_size - 1; i > remove_index; i--) {
+            sol->visited_cities[i] = sol->visited_cities[i-1];
+        }
+
+        sol->visited_cities[remove_index] = removed;
+        sol->num_visited_cities = old_size;
+        sol->prize_goal = current_prize;
+    }
+
+    free(candidates);
+}
+
+void swap_move(problem *prob, solution *sol, double *optval)
+{
+    bool *in_solution = allocate_vector(sizeof(bool), prob->num_all_cities);
+
+    for(int i = 0; i < prob->num_all_cities; i++) {
+        in_solution[i] = false;
+    }
+
+    for(int i = 0; i < sol->num_visited_cities; i++) {
+        in_solution[sol->visited_cities[i].id] = true;
+    }
+
+    int *outside_candidates = allocate_vector(sizeof(int), prob->num_all_cities - sol->num_visited_cities);
+    int num_outside = 0;
+
+    for(int i = 0; i < prob->num_all_cities; i++) {
+        if(!in_solution[i]) {
+            outside_candidates[num_outside++] = i;
+        }
+    }
+
+    int *inside_candidates = allocate_vector(sizeof(int), sol->num_visited_cities);
+    int num_inside = 0;
+
+    for(int i = 1; i < sol->num_visited_cities; i++) {
+        inside_candidates[num_inside++] = sol->visited_cities[i].id;
+    }
+
+    global_prob = prob;
+
+    qsort(outside_candidates, num_outside, sizeof(int), compare_parameter_desc);
+
+    qsort(inside_candidates, num_inside, sizeof(int), compare_parameter_asc);
+
+    float original_cost = sol->total_cost;
+    int current_prize = sol->prize_goal;
+
+    for(int o = 0; o < num_outside; o++) {
+
+        int outside_id = outside_candidates[o];
+        city outside_city = prob->all_cities[outside_id];
+
+        for(int i = 0; i < num_inside; i++) {
+
+            int inside_id = inside_candidates[i];
+
+            int pos = -1;
+
+            for(int k = 1; k < sol->num_visited_cities; k++) {
+                if(sol->visited_cities[k].id == inside_id) {
+                    pos = k;
+                    break;
+                }
+            }
+
+            if(pos == -1) continue;
+
+            city inside_city = sol->visited_cities[pos];
+
+            int new_prize = current_prize - inside_city.prize + outside_city.prize;
+
+            if(new_prize < prob->min_prize_goal) continue;
+
+            sol->visited_cities[pos] = outside_city;
+            sol->prize_goal = new_prize;
+
+            if(try_solution(prob, sol, optval, original_cost)) {
+                free(in_solution);
+                free(outside_candidates);
+                free(inside_candidates);
+                return;
+            }
+
+            sol->visited_cities[pos] = inside_city;
+            sol->prize_goal = current_prize;
+        }
+    }
+
+    free(in_solution);
+    free(outside_candidates);
+    free(inside_candidates);
+}
+
+void vnd(problem *prob, solution *sol, double *optval)
+{
+    int k = 1;
+
+    while(k <= 3) {
+
+        float cost_before = sol->total_cost;
+
+        if(k == 1) {
+            insertion_move(prob, sol, optval);
+        }
+        else if(k == 2) {
+            swap_move(prob, sol, optval);
+        }
+        else if(k == 3) {
+            drop_move(prob, sol, optval);
+        }
+
+        if(sol->total_cost < cost_before) {
+            k = 1;
+        } else {
+            k++;
+        }
+    }
+}
