@@ -169,6 +169,12 @@ void drop_move(problem *prob, solution *sol, double *optval)
         }
 
         temp_solution->num_visited_cities = temp_solution->num_visited_cities - 1;
+        
+        city *new_visited = realloc(temp_solution->visited_cities, temp_solution->num_visited_cities * sizeof(city));
+        if(new_visited != NULL) {
+            temp_solution->visited_cities = new_visited;
+        }
+        
         temp_solution->prize_goal -= removed.prize;
 
         if(try_solution(prob, temp_solution, optval, sol->total_cost)) {
@@ -192,7 +198,6 @@ void drop_move(problem *prob, solution *sol, double *optval)
             sol->total_cost = temp_solution->total_cost;
             
             free(temp_solution);
-            
             free(candidates);
             return;
         }
