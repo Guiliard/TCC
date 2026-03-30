@@ -65,4 +65,5 @@ void solve_tsp_with_concorde(solution *sol, double *optval) {
 
     sol->tour = tour_concorde;
     sol->tour_size = num_nodes;
+    sol->tour_cost = (float)*optval;
 }

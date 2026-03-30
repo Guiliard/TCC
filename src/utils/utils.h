@@ -39,6 +39,7 @@ typedef struct solution {
     int tour_size;
     int num_visited_cities;
     int prize_goal;
+    float tour_cost;
     float total_cost;
 } solution;
 

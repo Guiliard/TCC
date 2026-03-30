@@ -61,9 +61,8 @@ float calculate_total_penalty(city *all_cities, int tour_size, int num_all_citie
 }
 
 void calculate_objective_function(problem *prob, solution *sol) {
-    float cost = calculate_tour_cost(sol->tour_size, prob->asymmetric_distances, sol->tour);
     float total_penalty = calculate_total_penalty(prob->all_cities, sol->tour_size, prob->num_all_cities, sol->tour);
     float relative_penalty = prob->alpha * max(0, prob->min_prize_goal - sol->prize_goal);
 
-    sol->total_cost = cost + total_penalty + relative_penalty;
+    sol->total_cost = sol->tour_cost + total_penalty + relative_penalty;
 }
