@@ -30,16 +30,6 @@ float calculate_city_parameter(problem *prob, int city_index) {
     return c->parameter;
 }
 
-float calculate_tour_cost(int tour_size, int **asymmetric_distances, int *tour) {
-    float cost = 0.0;
-    
-    for (int i = 0; i < tour_size - 1; i++) {
-        cost += asymmetric_distances[tour[i]][tour[i + 1]];
-    }
-    
-    return cost;
-}
-
 float calculate_total_penalty(city *all_cities, int tour_size, int num_all_cities, int *tour) {
     bool *visited = (bool *)allocate_vector(sizeof(bool), num_all_cities);
 
@@ -58,6 +48,16 @@ float calculate_total_penalty(city *all_cities, int tour_size, int num_all_citie
     free(visited);
     
     return total_penalty;
+}
+
+double calculate_tour_cost(int tour_size, int **asymmetric_distances, int *tour) {
+    double cost = 0.0;
+    
+    for (int i = 0; i < tour_size - 1; i++) {
+        cost += asymmetric_distances[tour[i]][tour[i + 1]];
+    }
+    
+    return cost;
 }
 
 void calculate_objective_function(problem *prob, solution *sol) {
