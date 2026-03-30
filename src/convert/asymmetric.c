@@ -1,7 +1,7 @@
 #include "asymmetric.h"
 
 void convert_to_asymmetric(solution *sol) {
-    printf("Convertendo tour simétrico de volta para o problema original...\n");
+    //printf("Convertendo tour simétrico de volta para o problema original...\n");
 
     int start_index = -1;
 
@@ -37,7 +37,7 @@ void convert_to_asymmetric(solution *sol) {
             original_tour[original_count++] = original_city_index;
             visited[solution_index] = true;
 
-            printf("Node simétrico %d -> Solução index %d -> Cidade original %d\n", node, solution_index, original_city_index);
+            //printf("Node simétrico %d -> Solução index %d -> Cidade original %d\n", node, solution_index, original_city_index);
             
             if (original_count >= sol->num_visited_cities) {
                 break;
