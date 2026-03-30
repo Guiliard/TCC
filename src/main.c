@@ -4,7 +4,6 @@
 int main() {
     srand(time(NULL));
 
-    double optval;
     problem* prob = NULL;
     solution* sol = NULL;
 
@@ -20,8 +19,7 @@ int main() {
     sol = grasp(
         prob,
         MAX_ITER,
-        ALPHA,
-        &optval
+        ALPHA
     );
 
     print_solution(sol);

@@ -11,11 +11,11 @@
 int compare_parameter_asc(const void *a, const void *b);
 int compare_parameter_desc(const void *a, const void *b);
 
-bool try_solution(problem *prob, solution *sol, double *optval, float original_cost);
+bool try_solution(problem *prob, solution *sol, float original_cost);
 
-void insertion_move(problem* prob, solution* sol, double* optval);
-void drop_move(problem* prob, solution* sol, double* optval);
-void swap_move(problem* prob, solution* sol, double* optval);
-void vnd(problem* prob, solution* sol, double* optval);
+void insertion_move(problem* prob, solution* sol);
+void drop_move(problem* prob, solution* sol);
+void swap_move(problem* prob, solution* sol);
+void vnd(problem* prob, solution* sol);
 
 #endif

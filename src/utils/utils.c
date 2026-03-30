@@ -78,9 +78,11 @@ void print_solution(solution *sol) {
     for (int i = 0; i < sol->num_visited_cities; i++) {
         printf("Cidade %d: Prêmio = %d, Penalidade = %d, Distância Média = %.2f, Parâmetro = %.2f\n", sol->visited_cities[i].id, sol->visited_cities[i].prize, sol->visited_cities[i].penalty, sol->visited_cities[i].avg_distance, sol->visited_cities[i].parameter);
     }
+    print_tour(sol->tour_size, sol->tour);
     printf("Número de cidades visitadas: %d\n", sol->num_visited_cities);
     printf("Prêmio objetivo: %d\n", sol->prize_goal);
     printf("Custo total da solução: %.2f\n", sol->total_cost);
+    printf("Custo da tour: %.2f\n", sol->tour_cost);
 }
 
 solution* copy_solution(solution *sol) {

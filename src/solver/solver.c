@@ -1,6 +1,6 @@
 #include "solver.h"
 
-void solve_tsp_with_concorde(solution *sol, double *optval) {
+void solve_tsp_with_concorde(solution *sol) {
     CCdatagroup dat;
     CCrandstate rstate;
 
@@ -49,11 +49,11 @@ void solve_tsp_with_concorde(solution *sol, double *optval) {
 
     CCutil_sprand(42, &rstate);
     
-    int result = CCtsp_solve_dat(num_nodes, &dat, NULL, tour_concorde, NULL, optval, &success, &foundtour, name, &timebound, &hit_timebound, silent, &rstate);
+    int result = CCtsp_solve_dat(num_nodes, &dat, NULL, tour_concorde, NULL, &sol->tour_cost, &success, &foundtour, name, &timebound, &hit_timebound, silent, &rstate);
 
     if (result == 0 && foundtour) {
         printf("SOLUÇÃO ENCONTRADA!\n");
-        printf("Valor ótimo: %.2f\n", *optval);
+        printf("Valor ótimo: %.2f\n", sol->tour_cost);
     } else {
         printf("Não foi possível encontrar uma solução ótima.\n");
         printf("Success: %d, Foundtour: %d\n", success, foundtour);
@@ -65,5 +65,4 @@ void solve_tsp_with_concorde(solution *sol, double *optval) {
 
     sol->tour = tour_concorde;
     sol->tour_size = num_nodes;
-    sol->tour_cost = (float)*optval;
 }

@@ -1,8 +1,8 @@
 #include "construction.h"
 
-void resolve_tsp_with_concorde(problem* prob, solution *sol, double *optval) {
+void resolve_tsp_with_concorde(problem* prob, solution *sol) {
     convert_to_symmetric(prob, sol);
-    solve_tsp_with_concorde(sol, optval);
+    solve_tsp_with_concorde(sol);
     // print_tour(sol->tour_size, sol->tour);
     convert_to_asymmetric(sol);
     // print_tour(sol->tour_size, sol->tour);
@@ -11,12 +11,12 @@ void resolve_tsp_with_concorde(problem* prob, solution *sol, double *optval) {
     calculate_objective_function(prob, sol);
 }
 
-solution* grasp(problem* prob, int max_iter, float alpha, double *optval) {
+solution* grasp(problem* prob, int max_iter, float alpha) {
     solution* best_sol = NULL;
 
     for (int i = 0; i < max_iter; i++) {
-        solution* current_sol = build_initial_solution_grasp(prob, alpha, optval);
-        vnd(prob, current_sol, optval);
+        solution* current_sol = build_initial_solution_grasp(prob, alpha);
+        vnd(prob, current_sol);
 
         if (best_sol == NULL || current_sol->total_cost < best_sol->total_cost) {
             if (best_sol != NULL) {
@@ -31,7 +31,7 @@ solution* grasp(problem* prob, int max_iter, float alpha, double *optval) {
     return best_sol;
 }
 
-solution* build_initial_solution_grasp(problem *prob, float alpha, double *optval) {
+solution* build_initial_solution_grasp(problem *prob, float alpha) {
     solution* sol = allocate_vector(sizeof(solution), 1);
 
     bool *visited = allocate_vector(sizeof(bool), prob->num_all_cities);
@@ -112,7 +112,7 @@ solution* build_initial_solution_grasp(problem *prob, float alpha, double *optva
     sol->tour = NULL;
     sol->tour_size = 0;
 
-    resolve_tsp_with_concorde(prob, sol, optval);
+    resolve_tsp_with_concorde(prob, sol);
 
     return sol;
 }

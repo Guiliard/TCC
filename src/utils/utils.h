@@ -34,13 +34,13 @@ typedef struct problem {
 typedef struct solution {
     city* visited_cities;
     int** symmetric_distances;
-    int symmetric_distances_size;
     int* tour;
+    int symmetric_distances_size;
     int tour_size;
     int num_visited_cities;
     int prize_goal;
-    float tour_cost;
     float total_cost;
+    double tour_cost;
 } solution;
 
 void *allocate_vector(size_t element_size, size_t count);

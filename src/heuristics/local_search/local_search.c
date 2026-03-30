@@ -30,10 +30,10 @@ int compare_parameter_desc(const void *a, const void *b)
     return 0;
 }
 
-bool try_solution(problem *prob, solution *sol, double *optval, float original_cost)
+bool try_solution(problem *prob, solution *sol, float original_cost)
 {
     convert_to_symmetric(prob, sol);
-    solve_tsp_with_concorde(sol, optval);
+    solve_tsp_with_concorde(sol);
     convert_to_asymmetric(sol);
     convert_tour_to_min_cost(prob, sol);
     calculate_objective_function(prob, sol);
@@ -41,7 +41,7 @@ bool try_solution(problem *prob, solution *sol, double *optval, float original_c
     return sol->total_cost < original_cost;
 }
 
-void insertion_move(problem *prob, solution *sol, double *optval)
+void insertion_move(problem *prob, solution *sol)
 {
     bool *in_solution = allocate_vector(sizeof(bool), prob->num_all_cities);
 
@@ -82,7 +82,7 @@ void insertion_move(problem *prob, solution *sol, double *optval)
         temp_solution->num_visited_cities = temp_solution->num_visited_cities + 1;
         temp_solution->prize_goal += prob->all_cities[city_id].prize;
 
-        if(try_solution(prob, temp_solution, optval, sol->total_cost)) {
+        if(try_solution(prob, temp_solution, sol->total_cost)) {
             
             free(sol->visited_cities);
             if(sol->symmetric_distances != NULL) {
@@ -116,7 +116,7 @@ void insertion_move(problem *prob, solution *sol, double *optval)
     free(candidates);
 }
 
-void drop_move(problem *prob, solution *sol, double *optval)
+void drop_move(problem *prob, solution *sol)
 {
     if(sol->num_visited_cities <= 1) {
         return;
@@ -177,7 +177,7 @@ void drop_move(problem *prob, solution *sol, double *optval)
         
         temp_solution->prize_goal -= removed.prize;
 
-        if(try_solution(prob, temp_solution, optval, sol->total_cost)) {
+        if(try_solution(prob, temp_solution, sol->total_cost)) {
             
             free(sol->visited_cities);
             if(sol->symmetric_distances != NULL) {
@@ -208,7 +208,7 @@ void drop_move(problem *prob, solution *sol, double *optval)
     free(candidates);
 }
 
-void swap_move(problem *prob, solution *sol, double *optval)
+void swap_move(problem *prob, solution *sol)
 {
     bool *in_solution = allocate_vector(sizeof(bool), prob->num_all_cities);
 
@@ -271,7 +271,7 @@ void swap_move(problem *prob, solution *sol, double *optval)
             temp_solution->visited_cities[pos] = outside_city;
             temp_solution->prize_goal = new_prize;
 
-            if(try_solution(prob, temp_solution, optval, sol->total_cost)) {
+            if(try_solution(prob, temp_solution, sol->total_cost)) {
                 
                 free(sol->visited_cities);
                 if(sol->symmetric_distances != NULL) {
@@ -308,7 +308,7 @@ void swap_move(problem *prob, solution *sol, double *optval)
     free(inside_candidates);
 }
 
-void vnd(problem *prob, solution *sol, double *optval)
+void vnd(problem *prob, solution *sol)
 {
     int k = 1;
 
@@ -317,13 +317,13 @@ void vnd(problem *prob, solution *sol, double *optval)
         float cost_before = sol->total_cost;
 
         if(k == 1) {
-            insertion_move(prob, sol, optval);
+            insertion_move(prob, sol);
         }
         else if(k == 2) {
-            swap_move(prob, sol, optval);
+            swap_move(prob, sol);
         }
         else if(k == 3) {
-            drop_move(prob, sol, optval);
+            drop_move(prob, sol);
         }
         
         if(sol->total_cost < cost_before) {
