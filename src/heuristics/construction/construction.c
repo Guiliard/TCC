@@ -3,11 +3,8 @@
 void resolve_tsp_with_concorde(problem* prob, solution *sol) {
     convert_to_symmetric(prob, sol);
     solve_tsp_with_concorde(sol);
-    // print_tour(sol->tour_size, sol->tour);
     convert_to_asymmetric(sol);
-    // print_tour(sol->tour_size, sol->tour);
     convert_tour_to_min_cost(prob, sol);
-    // print_tour(sol->tour_size, sol->tour);
     calculate_objective_function(prob, sol);
 }
 
@@ -16,7 +13,7 @@ solution* grasp(problem* prob, int max_iter, float alpha) {
 
     for (int i = 0; i < max_iter; i++) {
         solution* current_sol = build_initial_solution_grasp(prob, alpha);
-        vnd(prob, current_sol);
+        vnd(prob, current_sol, CANDIDATE_SELECTION_ORDERED);
 
         if (best_sol == NULL || current_sol->total_cost < best_sol->total_cost) {
             if (best_sol != NULL) {

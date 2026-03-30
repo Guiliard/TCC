@@ -13,6 +13,10 @@
 #define MAX_ITER 1
 #define ALPHA 0.1f
 
+#define CANDIDATE_SELECTION_ORDERED 0
+#define CANDIDATE_SELECTION_RANDOM 1
+#define CANDIDATE_SELECTION_ROULETTE 2
+
 typedef struct city {
 	int id;
     int prize;

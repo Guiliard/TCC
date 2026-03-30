@@ -2,6 +2,89 @@
 
 problem *global_prob;
 
+void shuffle_array(int *array, int size)
+{
+    for (int i = size - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        int temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
+void roulette_select(int *candidates, int num_candidates)
+{
+    int *selected = allocate_vector(sizeof(int), num_candidates);
+    bool *used = allocate_vector(sizeof(bool), num_candidates);
+
+    for (int i = 0; i < num_candidates; i++) {
+        used[i] = false;
+    }
+
+    for (int s = 0; s < num_candidates; s++) {
+        float random_value = (rand() % 100) + 1;
+        float cumulative = 0.0f;
+        int selected_index = -1;
+
+        float remaining_parameter = 0.0f;
+        for (int i = 0; i < num_candidates; i++) {
+            if (!used[i]) {
+                remaining_parameter += global_prob->all_cities[candidates[i]].parameter;
+            }
+        }
+
+        if (remaining_parameter <= 0.0f) {
+            for (int i = 0; i < num_candidates; i++) {
+                if (!used[i]) {
+                    selected_index = i;
+                    break;
+                }
+            }
+        } else {
+            for (int i = 0; i < num_candidates; i++) {
+                if (!used[i]) {
+                    float probability = (global_prob->all_cities[candidates[i]].parameter / remaining_parameter) * 100.0f;
+                    cumulative += probability;
+                    if (random_value <= cumulative) {
+                        selected_index = i;
+                        break;
+                    }
+                }
+            }
+
+            if (selected_index == -1) {
+                for (int i = num_candidates - 1; i >= 0; i--) {
+                    if (!used[i]) {
+                        selected_index = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        selected[s] = candidates[selected_index];
+        used[selected_index] = true;
+    }
+
+    for (int i = 0; i < num_candidates; i++) {
+        candidates[i] = selected[i];
+    }
+
+    free(selected);
+    free(used);
+}
+
+void select_candidates(int *candidates, int num_candidates, int selection, int (*compar)(const void*, const void*))
+{
+    if (selection == CANDIDATE_SELECTION_ORDERED) {
+        qsort(candidates, num_candidates, sizeof(int), compar);
+    } else if (selection == CANDIDATE_SELECTION_RANDOM) {
+        shuffle_array(candidates, num_candidates);
+    } else if (selection == CANDIDATE_SELECTION_ROULETTE) {
+        roulette_select(candidates, num_candidates);
+    }
+}
+
 int compare_parameter_asc(const void *a, const void *b)
 {
     int city_a = *(int*)a;
@@ -41,7 +124,7 @@ bool try_solution(problem *prob, solution *sol, float original_cost)
     return sol->total_cost < original_cost;
 }
 
-void insertion_move(problem *prob, solution *sol)
+void insertion_move(problem *prob, solution *sol, int selection)
 {
     bool *in_solution = allocate_vector(sizeof(bool), prob->num_all_cities);
 
@@ -63,8 +146,8 @@ void insertion_move(problem *prob, solution *sol)
     }
 
     global_prob = prob;
-
-    qsort(candidates, num_candidates, sizeof(int), compare_parameter_desc);
+    
+    select_candidates(candidates, num_candidates, selection, compare_parameter_desc);
 
     for(int c = 0; c < num_candidates; c++) {
         int city_id = candidates[c];
@@ -116,7 +199,7 @@ void insertion_move(problem *prob, solution *sol)
     free(candidates);
 }
 
-void drop_move(problem *prob, solution *sol)
+void drop_move(problem *prob, solution *sol, int selection)
 {
     if(sol->num_visited_cities <= 1) {
         return;
@@ -141,8 +224,8 @@ void drop_move(problem *prob, solution *sol)
     }
 
     global_prob = prob;
-
-    qsort(candidates, num_candidates, sizeof(int), compare_parameter_asc);
+    
+    select_candidates(candidates, num_candidates, selection, compare_parameter_asc);
 
     for(int c = 0; c < num_candidates; c++) {
         int city_id = candidates[c];
@@ -208,7 +291,7 @@ void drop_move(problem *prob, solution *sol)
     free(candidates);
 }
 
-void swap_move(problem *prob, solution *sol)
+void swap_move(problem *prob, solution *sol, int selection)
 {
     bool *in_solution = allocate_vector(sizeof(bool), prob->num_all_cities);
 
@@ -238,9 +321,8 @@ void swap_move(problem *prob, solution *sol)
 
     global_prob = prob;
 
-    qsort(outside_candidates, num_outside, sizeof(int), compare_parameter_desc);
-
-    qsort(inside_candidates, num_inside, sizeof(int), compare_parameter_asc);
+    select_candidates(outside_candidates, num_outside, selection, compare_parameter_desc);
+    select_candidates(inside_candidates, num_inside, selection, compare_parameter_asc);
 
     for(int o = 0; o < num_outside; o++) {
 
@@ -308,7 +390,7 @@ void swap_move(problem *prob, solution *sol)
     free(inside_candidates);
 }
 
-void vnd(problem *prob, solution *sol)
+void vnd(problem *prob, solution *sol, int selection)
 {
     int k = 1;
 
@@ -317,13 +399,13 @@ void vnd(problem *prob, solution *sol)
         float cost_before = sol->total_cost;
 
         if(k == 1) {
-            insertion_move(prob, sol);
+            insertion_move(prob, sol, selection);
         }
         else if(k == 2) {
-            swap_move(prob, sol);
+            swap_move(prob, sol, selection);
         }
         else if(k == 3) {
-            drop_move(prob, sol);
+            drop_move(prob, sol, selection);
         }
         
         if(sol->total_cost < cost_before) {
