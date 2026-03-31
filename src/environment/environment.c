@@ -26,8 +26,6 @@ void initialize_alpha(problem *prob) {
         }
     }
 
-    //printf("Soma total de todos os custos: %.2f\n", total_sum);
-    
     int total_elements = prob->num_all_cities * (prob->num_all_cities - 1);
     int *all_distances = (int *)allocate_vector(sizeof(int), total_elements);
     
@@ -45,21 +43,13 @@ void initialize_alpha(problem *prob) {
     float sum_n_largest = 0.0;
     int count = (prob->num_all_cities < total_elements) ? prob->num_all_cities : total_elements;
 
-    //printf("As %u maiores distâncias: ", count);
     for (int i = 0; i < count; i++) {
         sum_n_largest += all_distances[i];
-        //printf("%d", all_distances[i]);
-        // if (i < count - 1) {
-        //     printf(", ");
-        // }
     }
-    //printf("\n");
     
     free(all_distances);
     
     prob->alpha = total_sum + sum_n_largest;
-
-    //printf("Alpha = %.2f (soma total) + %.2f (%u maiores) = %.2f\n", total_sum, sum_n_largest, prob->num_all_cities, prob->alpha);
 }
 
 problem* init_environment(char *number_file, char *prize_file, char* penalty_file, char *distance_file) {
@@ -104,7 +94,7 @@ problem* init_environment(char *number_file, char *prize_file, char* penalty_fil
     free(prize_content);
     free(penalty_content);
     free(distance_content);
-    
+
     initialize_alpha(prob);
     initialize_city_parameters(prob);
 

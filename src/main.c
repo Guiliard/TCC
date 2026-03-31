@@ -8,11 +8,18 @@ int main() {
     problem* prob = NULL;
     solution* sol = NULL;
 
+    // prob = init_environment(
+    //     "dataset/atex1/atex1_N.pctsp", 
+    //     "dataset/atex1/atex1_P.pctsp", 
+    //     "dataset/atex1/atex1_w100.pctsp", 
+    //     "dataset/atex1/atex1_C.pctsp"
+    // );
+
     prob = init_environment(
-        "dataset/atex1_N.pctsp", 
-        "dataset/atex1_P.pctsp", 
-        "dataset/atex1_w100.pctsp", 
-        "dataset/atex1_C.pctsp"
+        "dataset/rbg403/rbg403_N.pctsp", 
+        "dataset/rbg403/rbg403_P.pctsp", 
+        "dataset/rbg403/rbg403_w100.pctsp", 
+        "dataset/rbg403/rbg403_C.pctsp"
     );
 
     print_problem(prob);
@@ -31,7 +38,7 @@ int main() {
     print_solution(sol);
     
     print_report(
-        "atex1",
+        "rbg403",
         prob,
         sol,
         m->elapsed_time,
