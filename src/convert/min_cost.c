@@ -9,15 +9,9 @@ void convert_tour_to_min_cost(problem *prob, solution *sol) {
 
     double cost_reverse = calculate_tour_cost(sol->tour_size, prob->asymmetric_distances, reverse_tour);
 
-    //printf("Tour na direção normal: %.2f", cost_normal);
-    //printf("\nTour na direção reversa: %.2f\n", cost_reverse);
-
     if (cost_reverse < sol->tour_cost) {
-        //printf("Invertendo tour para direção reversa (custo: %.2f)\n", cost_reverse);
         memcpy(sol->tour, reverse_tour, sol->tour_size * sizeof(int));
         sol->tour_cost = cost_reverse;
-    } else {
-        //printf("Mantendo tour na direção normal (custo: %.2f)\n", cost_normal);
     }
     
     free(reverse_tour);

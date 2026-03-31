@@ -61,4 +61,6 @@ solution* copy_solution(solution *sol);
 void free_problem(problem *prob);
 void free_solution(solution *sol);
 
+void print_report(const char *instance_name, problem *prob, solution *sol, double execution_time, float alpha, int num_iterations, int candidate_selection_type);
+
 #endif

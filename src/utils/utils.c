@@ -136,3 +136,37 @@ void free_solution(solution *sol) {
     free(sol->tour);
     free(sol);
 }
+
+void print_report(const char *instance_name, problem *prob, solution *sol, double execution_time, float alpha, int num_iterations, int candidate_selection_type)
+{
+    const char *selection_type_str = "UNKNOWN";
+    
+    switch (candidate_selection_type) {
+        case CANDIDATE_SELECTION_ORDERED:
+            selection_type_str = "ORDERED";
+            break;
+        case CANDIDATE_SELECTION_RANDOM:
+            selection_type_str = "RANDOM";
+            break;
+        case CANDIDATE_SELECTION_ROULETTE:
+            selection_type_str = "ROULETTE";
+            break;
+    }
+
+    printf("\n");
+    printf("╔════════════════════════════════════════════════════════════════╗\n");
+    printf("║                  RELATÓRIO DE EXECUÇÃO - PCTSP                 ║\n");
+    printf("╚════════════════════════════════════════════════════════════════╝\n");
+    printf("\n");
+    printf("  Instância:                       %s\n", instance_name);
+    printf("  Prêmio Mínimo:                   %d\n", prob->min_prize_goal);
+    printf("  Prêmio Coletado:                 %d\n", sol->prize_goal);
+    printf("  Tempo de Execução:               %.6f segundos\n", execution_time);
+    printf("  Função Objetivo (FO):            %.2f\n", sol->total_cost);
+    printf("  Alpha (GRASP):                   %.4f\n", alpha);
+    printf("  Número de Iterações:             %d\n", num_iterations);
+    printf("  Tipo de Seleção:                 %s\n", selection_type_str);
+    printf("\n");
+    printf("════════════════════════════════════════════════════════════════\n");
+    printf("\n");
+}

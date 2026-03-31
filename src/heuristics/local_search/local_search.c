@@ -76,12 +76,16 @@ void roulette_select(int *candidates, int num_candidates)
 
 void select_candidates(int *candidates, int num_candidates, int selection, int (*compar)(const void*, const void*))
 {
-    if (selection == CANDIDATE_SELECTION_ORDERED) {
-        qsort(candidates, num_candidates, sizeof(int), compar);
-    } else if (selection == CANDIDATE_SELECTION_RANDOM) {
-        shuffle_array(candidates, num_candidates);
-    } else if (selection == CANDIDATE_SELECTION_ROULETTE) {
-        roulette_select(candidates, num_candidates);
+    switch (selection) {
+        case CANDIDATE_SELECTION_ORDERED:
+            qsort(candidates, num_candidates, sizeof(int), compar);
+            break;
+        case CANDIDATE_SELECTION_RANDOM:
+            shuffle_array(candidates, num_candidates);
+            break;
+        case CANDIDATE_SELECTION_ROULETTE:
+            roulette_select(candidates, num_candidates);
+            break;
     }
 }
 
