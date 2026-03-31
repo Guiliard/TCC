@@ -1,13 +1,5 @@
 #include "construction.h"
 
-void resolve_tsp_with_concorde(problem* prob, solution *sol) {
-    convert_to_symmetric(prob, sol);
-    solve_tsp_with_concorde(sol);
-    convert_to_asymmetric(sol);
-    convert_tour_to_min_cost(prob, sol);
-    calculate_objective_function(prob, sol);
-}
-
 solution* grasp(problem* prob, int max_iter, float alpha) {
     solution* best_sol = NULL;
 
@@ -109,7 +101,11 @@ solution* build_initial_solution_grasp(problem *prob, float alpha) {
     sol->tour = NULL;
     sol->tour_size = 0;
 
-    resolve_tsp_with_concorde(prob, sol);
+    convert_to_symmetric(prob, sol);
+    solve_tsp_with_concorde(sol);
+    convert_to_asymmetric(sol);
+    convert_tour_to_min_cost(prob, sol);
+    calculate_objective_function(prob, sol);
 
     return sol;
 }
