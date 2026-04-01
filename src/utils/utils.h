@@ -10,7 +10,7 @@
 #define FLT_MAX	__FLT_MAX__
 
 #define PERCENT_OF_PRIZE 0.2
-#define MAX_ITER 1
+#define MAX_ITER 100
 #define ALPHA 0.1f
 
 #define CANDIDATE_SELECTION_ORDERED 0

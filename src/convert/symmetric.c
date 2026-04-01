@@ -5,13 +5,6 @@ void convert_to_symmetric(problem *prob, solution *sol) {
     int new_size = 2 * n;
     int idx_i, idx_j;
 
-    if(sol->symmetric_distances != NULL) {
-        for (int i = 0; i < sol->symmetric_distances_size; i++) {
-            free(sol->symmetric_distances[i]);
-        }
-        free(sol->symmetric_distances);
-    }
-
     sol->symmetric_distances = allocate_matrix(new_size, new_size);
     sol->symmetric_distances_size = new_size;
 

@@ -7,13 +7,7 @@ int main() {
 
     problem* prob = NULL;
     solution* sol = NULL;
-
-    // prob = init_environment(
-    //     "dataset/atex1/atex1_N.pctsp", 
-    //     "dataset/atex1/atex1_P.pctsp", 
-    //     "dataset/atex1/atex1_w100.pctsp", 
-    //     "dataset/atex1/atex1_C.pctsp"
-    // );
+    metrics* m = create_metrics();
 
     prob = init_environment(
         "dataset/rbg403/rbg403_N.pctsp", 
@@ -22,9 +16,6 @@ int main() {
         "dataset/rbg403/rbg403_C.pctsp"
     );
 
-    print_problem(prob);
-
-    metrics* m = create_metrics();
     start_metrics(m);
 
     sol = grasp(
@@ -34,8 +25,6 @@ int main() {
     );
 
     stop_metrics(m);
-
-    print_solution(sol);
     
     print_report(
         "rbg403",
