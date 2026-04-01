@@ -10,6 +10,7 @@
 #include <float.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <linux/limits.h>
 
 #endif

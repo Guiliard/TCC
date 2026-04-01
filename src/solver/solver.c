@@ -7,7 +7,7 @@ void solve_tsp_with_concorde(solution *sol) {
     int num_nodes = 2 * sol->num_visited_cities;
     int success, foundtour;
     int hit_timebound = 0;
-    int silent = 0;
+    int silent = 1;
 
     int *tour_concorde = (int *)allocate_vector(sizeof(int), num_nodes);
 
@@ -48,15 +48,28 @@ void solve_tsp_with_concorde(solution *sol) {
     }
 
     CCutil_sprand(42, &rstate);
+
+    int saved_stdout = dup(STDOUT_FILENO);
+    int saved_stderr = dup(STDERR_FILENO);
+
+    int devnull = open("/dev/null", O_WRONLY);
+    dup2(devnull, STDOUT_FILENO);
+    dup2(devnull, STDERR_FILENO);
     
     int result = CCtsp_solve_dat(num_nodes, &dat, NULL, tour_concorde, NULL, &sol->tour_cost, &success, &foundtour, name, &timebound, &hit_timebound, silent, &rstate);
 
-    if (result == 0 && foundtour) {
-        printf("SOLUÇÃO ENCONTRADA!\n");
-        printf("Valor ótimo: %.2f\n", sol->tour_cost);
-    } else {
-        printf("Não foi possível encontrar uma solução ótima.\n");
-        printf("Success: %d, Foundtour: %d\n", success, foundtour);
+    fflush(stdout);
+    fflush(stderr);
+
+    dup2(saved_stdout, STDOUT_FILENO);
+    dup2(saved_stderr, STDERR_FILENO);
+
+    close(devnull);
+    close(saved_stdout);
+    close(saved_stderr);
+
+    if (result != 0 || !foundtour) {
+        exit(1);
     }
     
     free(adj);
