@@ -46,43 +46,38 @@ void roulette_select(int *candidates, int num_candidates)
     int *selected = allocate_vector(sizeof(int), num_candidates);
     bool *used = allocate_vector(sizeof(bool), num_candidates);
 
-    for (int s = 0; s < num_candidates; s++) {
-        float random_value = (rand() % 100) + 1;
-        float cumulative = 0.0f;
-        int selected_index = -1;
+    for(int s = 0; s < num_candidates; s++) {
 
         float remaining_parameter = 0.0f;
-        for (int i = 0; i < num_candidates; i++) {
-            if (!used[i]) {
+
+        for(int i = 0; i < num_candidates; i++) {
+            if(!used[i]) {
                 remaining_parameter += global_prob->all_cities[candidates[i]].parameter;
             }
         }
 
-        if (remaining_parameter <= 0.0f) {
-            for (int i = 0; i < num_candidates; i++) {
-                if (!used[i]) {
+        float random_value = ((float)rand() / RAND_MAX) * remaining_parameter;
+
+        float cumulative = 0.0f;
+        int selected_index = -1;
+
+        for(int i = 0; i < num_candidates; i++) {
+
+            if(used[i]) continue;
+
+            cumulative += global_prob->all_cities[candidates[i]].parameter;
+
+            if(cumulative >= random_value) {
+                selected_index = i;
+                break;
+            }
+        }
+
+        if(selected_index == -1) {
+            for(int i = 0; i < num_candidates; i++) {
+                if(!used[i]) {
                     selected_index = i;
                     break;
-                }
-            }
-        } else {
-            for (int i = 0; i < num_candidates; i++) {
-                if (!used[i]) {
-                    float probability = (global_prob->all_cities[candidates[i]].parameter / remaining_parameter) * 100.0f;
-                    cumulative += probability;
-                    if (random_value <= cumulative) {
-                        selected_index = i;
-                        break;
-                    }
-                }
-            }
-
-            if (selected_index == -1) {
-                for (int i = num_candidates - 1; i >= 0; i--) {
-                    if (!used[i]) {
-                        selected_index = i;
-                        break;
-                    }
                 }
             }
         }
@@ -91,9 +86,7 @@ void roulette_select(int *candidates, int num_candidates)
         used[selected_index] = true;
     }
 
-    for (int i = 0; i < num_candidates; i++) {
-        candidates[i] = selected[i];
-    }
+    memcpy(candidates, selected, num_candidates*sizeof(int));
 
     free(selected);
     free(used);
