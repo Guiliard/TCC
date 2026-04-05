@@ -234,7 +234,7 @@ void swap_city_in_tour(solution *sol, int city_k_id, int position_to_replace)
 
 void insertion_move(problem *prob, solution *sol, int selection)
 {
-    int *candidates = allocate_vector(sizeof(int), prob->num_all_cities);
+    int *candidates = allocate_vector(sizeof(int), prob->num_all_cities - sol->num_visited_cities);
     int num_candidates = 0;
 
     for(int i = 0; i < prob->num_all_cities; i++) {
