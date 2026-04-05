@@ -287,6 +287,9 @@ void insertion_move(problem *prob, solution *sol, int selection)
     }
     
     free(candidates);
+
+    global_dist = 0;
+    global_prob = NULL;
 }
 
 void drop_move(problem *prob, solution *sol, int selection)
@@ -362,6 +365,9 @@ void drop_move(problem *prob, solution *sol, int selection)
     }
 
     free(candidates);
+
+    global_dist = 0;
+    global_prob = NULL;
 }
 
 void swap_move(problem *prob, solution *sol, int selection)
@@ -446,6 +452,9 @@ void swap_move(problem *prob, solution *sol, int selection)
 
     free(outside_candidates);
     free(inside_candidates);
+
+    global_dist = 0;
+    global_prob = NULL;
 }
 
 void vnd(problem *prob, solution *sol, int selection)
