@@ -29,6 +29,8 @@ solution* build_initial_solution_grasp(problem *prob, float alpha) {
     float *values = allocate_vector(sizeof(float), prob->num_all_cities);
     int *RCL = allocate_vector(sizeof(int), prob->num_all_cities);
 
+    int* positions_in_visited = allocate_vector(sizeof(int), prob->num_all_cities);
+
     int count = 1;
     int total_prize = 0;
     int capacity = prob->min_prize_goal;
@@ -93,6 +95,15 @@ solution* build_initial_solution_grasp(problem *prob, float alpha) {
 
     selected = realloc(selected, count * sizeof(city));
 
+    for(int i = 0; i < prob->num_all_cities; i++) {
+        positions_in_visited[i] = -1;
+    }
+
+    for(int i = 0; i < count; i++) {
+        int city_id = selected[i].id;
+        positions_in_visited[city_id] = i;
+    }
+
     sol->visited_cities = selected;
     sol->num_visited_cities = count;
     sol->prize_goal = total_prize;
@@ -100,6 +111,8 @@ solution* build_initial_solution_grasp(problem *prob, float alpha) {
     sol->symmetric_distances_size = 0;
     sol->tour = NULL;
     sol->tour_size = 0;
+    sol->city_pos_in_visited = positions_in_visited;
+    sol->city_pos_in_tour = NULL;
 
     convert_to_symmetric(prob, sol);
     solve_tsp_with_concorde(sol);

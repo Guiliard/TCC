@@ -19,32 +19,44 @@
 
 typedef struct city {
 	int id;
+
     int prize;
     int penalty;
+
     float avg_distance;
     float parameter;
 } city;
 
 typedef struct problem {
     city* all_cities;
-    int** asymmetric_distances;
     int num_all_cities;
+
+    int** asymmetric_distances;
+
     int total_prize;
-    int min_prize_goal;
     float percent_of_prize;
+    int min_prize_goal;
+
     float alpha;
 } problem;
 
 typedef struct solution {
     city* visited_cities;
-    int** symmetric_distances;
-    int* tour;
-    int symmetric_distances_size;
-    int tour_size;
     int num_visited_cities;
-    int prize_goal;
-    float total_cost;
+
+    int** symmetric_distances;
+    int symmetric_distances_size;
+
+    int *city_pos_in_tour;
+    int *city_pos_in_visited;
+
+    int* tour;
+    int tour_size;
     double tour_cost;
+
+    int prize_goal;
+
+    float total_cost;
 } solution;
 
 void *allocate_vector(size_t element_size, size_t count);
@@ -55,8 +67,6 @@ void print_tour(int tour_size, int *tour);
 
 void print_problem(problem *prob);
 void print_solution(solution *sol);
-
-solution* copy_solution(solution *sol);
 
 void free_problem(problem *prob);
 void free_solution(solution *sol);

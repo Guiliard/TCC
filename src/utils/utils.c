@@ -85,33 +85,6 @@ void print_solution(solution *sol) {
     printf("Custo da tour: %.2f\n", sol->tour_cost);
 }
 
-solution* copy_solution(solution *sol) {
-    solution *new_sol = allocate_vector(sizeof(solution), 1);
-
-    new_sol->visited_cities = allocate_vector(sizeof(city), sol->num_visited_cities);
-    
-    int sym_size = sol->symmetric_distances_size;
-    new_sol->symmetric_distances = allocate_matrix(sym_size, sym_size);
-    new_sol->symmetric_distances_size = sym_size;
-    
-    new_sol->tour = allocate_vector(sizeof(int), sol->tour_size);
-
-    memcpy(new_sol->visited_cities, sol->visited_cities, sol->num_visited_cities * sizeof(city));
-
-    for (int i = 0; i < sym_size; i++) {
-        memcpy(new_sol->symmetric_distances[i], sol->symmetric_distances[i], sym_size * sizeof(int));
-    }
-
-    memcpy(new_sol->tour, sol->tour, sol->tour_size * sizeof(int));
-
-    new_sol->tour_size = sol->tour_size;
-    new_sol->num_visited_cities = sol->num_visited_cities;
-    new_sol->prize_goal = sol->prize_goal;
-    new_sol->total_cost = sol->total_cost;
-
-    return new_sol;
-}
-
 void free_problem(problem *prob) {
     free(prob->all_cities);
 
