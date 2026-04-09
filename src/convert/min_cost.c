@@ -9,10 +9,13 @@ void convert_tour_to_min_cost(problem *prob, solution *sol) {
     }
 
     double cost_reverse = calculate_tour_cost(sol->tour_size, prob->asymmetric_distances, reverse_tour);
+    double cost_original = calculate_tour_cost(sol->tour_size, prob->asymmetric_distances, sol->tour);
 
-    if (cost_reverse < sol->tour_cost) {
+    if (cost_reverse < cost_original) {
         memcpy(sol->tour, reverse_tour, sol->tour_size * sizeof(int));
         sol->tour_cost = cost_reverse;
+    } else {
+        sol->tour_cost = cost_original;
     }
 
     for(int i = 0; i < prob->num_all_cities; i++) {

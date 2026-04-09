@@ -111,6 +111,7 @@ solution* build_initial_solution_grasp(problem *prob, float alpha) {
     sol->symmetric_distances_size = 0;
     sol->tour = NULL;
     sol->tour_size = 0;
+    sol->tour_cost = 0.0;
     sol->city_pos_in_visited = positions_in_visited;
     sol->city_pos_in_tour = NULL;
 

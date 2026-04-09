@@ -4,6 +4,8 @@ void solve_tsp_with_concorde(solution *sol) {
     CCdatagroup dat;
     CCrandstate rstate;
 
+    double optval;
+
     int num_nodes = 2 * sol->num_visited_cities;
     int success, foundtour;
     int hit_timebound = 0;
@@ -56,7 +58,7 @@ void solve_tsp_with_concorde(solution *sol) {
     dup2(devnull, STDOUT_FILENO);
     dup2(devnull, STDERR_FILENO);
     
-    int result = CCtsp_solve_dat(num_nodes, &dat, NULL, tour_concorde, NULL, &sol->tour_cost, &success, &foundtour, name, &timebound, &hit_timebound, silent, &rstate);
+    int result = CCtsp_solve_dat(num_nodes, &dat, NULL, tour_concorde, NULL, &optval, &success, &foundtour, name, &timebound, &hit_timebound, silent, &rstate);
 
     fflush(stdout);
     fflush(stderr);
