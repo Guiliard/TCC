@@ -1,0 +1,6 @@
+targetRunner = "./target-runner"
+parameterFile = "./parameters.txt"
+trainInstancesFile = "./instances.txt"
+
+maxExperiments = 100
+logFile = "./irace.Rdata"

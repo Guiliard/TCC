@@ -2,43 +2,91 @@
 #include "heuristics/construction/construction.h"
 #include "metrics/metrics.h"
 
-int main() {
-    srand(time(NULL));
+int main(int argc, char *argv[]) {
+    // srand(time(NULL));
+
+    char instance[INSTANCE_NAME_SIZE] = "rbg403";
+    float alpha = 0.3f;
+    int max_iter = 100;
+    int selection = CANDIDATE_SELECTION_ORDERED;
+    unsigned int seed = 12345;
+
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--instance") == 0 && i + 1 < argc) {
+            strncpy(instance, argv[++i], INSTANCE_NAME_SIZE - 1);
+            instance[INSTANCE_NAME_SIZE - 1] = '\0';
+        }
+        else if (strcmp(argv[i], "--alpha") == 0 && i + 1 < argc) {
+            alpha = atof(argv[++i]);
+        }
+        else if (strcmp(argv[i], "--max-iter") == 0 && i + 1 < argc) {
+            max_iter = atoi(argv[++i]);
+        }
+        else if (strcmp(argv[i], "--selection") == 0 && i + 1 < argc) {
+            char *value = argv[++i];
+
+            if (strcmp(value, "ordered") == 0) {
+                selection = CANDIDATE_SELECTION_ORDERED;
+            }
+            else if (strcmp(value, "random") == 0) {
+                selection = CANDIDATE_SELECTION_RANDOM;
+            }
+            else if (strcmp(value, "roulette") == 0) {
+                selection = CANDIDATE_SELECTION_ROULETTE;
+            }
+            else {
+                fprintf(stderr, "Erro: valor invalido para --selection: %s\n", value);
+                return 1;
+            }
+        }
+        else if (strcmp(argv[i], "--seed") == 0 && i + 1 < argc) {
+            seed = (unsigned int) atoi(argv[++i]);
+        }
+        else {
+            fprintf(stderr, "Argumento invalido: %s\n", argv[i]);
+            return 1;
+        }
+    }
+
+    char n_file[512];
+    char p_file[512];
+    char w_file[512];
+    char c_file[512];
+
+    snprintf(n_file, sizeof(n_file), "dataset/%s/%s_N.pctsp", instance, instance);
+    snprintf(p_file, sizeof(p_file), "dataset/%s/%s_P.pctsp", instance, instance);
+    snprintf(w_file, sizeof(w_file), "dataset/%s/%s_w100.pctsp", instance, instance);
+    snprintf(c_file, sizeof(c_file), "dataset/%s/%s_C.pctsp", instance, instance);
+
+    if (alpha < 0.0f || alpha > 1.0f) {
+        fprintf(stderr, "Erro: alpha deve estar entre 0 e 1\n");
+        return 1;
+    }
+
+    if (max_iter <= 0) {
+        fprintf(stderr, "Erro: max_iter deve ser maior que zero\n");
+        return 1;
+    }
+
+    srand(seed);
 
     problem* prob = NULL;
     solution* sol = NULL;
     metrics* m = create_metrics();
 
-    prob = init_environment(
-        "dataset/rbg403/rbg403_N.pctsp", 
-        "dataset/rbg403/rbg403_P.pctsp", 
-        "dataset/rbg403/rbg403_w100.pctsp", 
-        "dataset/rbg403/rbg403_C.pctsp"
-    );
+    prob = init_environment(n_file, p_file, w_file, c_file);
 
     start_metrics(m);
 
-    sol = grasp(
-        prob,
-        MAX_ITER,
-        ALPHA
-    );
+    sol = grasp(prob, max_iter, alpha, selection);
 
     stop_metrics(m);
-    
-    print_report(
-        "rbg403",
-        prob,
-        sol,
-        m->elapsed_time,
-        ALPHA,
-        MAX_ITER,
-        CANDIDATE_SELECTION_ORDERED
-    );
+
+    printf("%.2f\n", sol->total_cost);
 
     free_problem(prob);
     free_solution(sol);
     free_metrics(m);
-    
+
     return 0;
 }

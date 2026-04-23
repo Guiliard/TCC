@@ -1,11 +1,11 @@
 #include "construction.h"
 
-solution* grasp(problem* prob, int max_iter, float alpha) {
+solution* grasp(problem* prob, int max_iter, float alpha, int candidate_selection_strategy) {
     solution* best_sol = NULL;
 
     for (int i = 0; i < max_iter; i++) {
         solution* current_sol = build_initial_solution_grasp(prob, alpha);
-        vnd(prob, current_sol, CANDIDATE_SELECTION_ORDERED);
+        vnd(prob, current_sol, candidate_selection_strategy);
 
         if (best_sol == NULL || current_sol->total_cost < best_sol->total_cost) {
             if (best_sol != NULL) {

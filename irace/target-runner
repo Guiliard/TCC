@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+CONFIG_ID="$1"
+INSTANCE_ID="$2"
+SEED="$3"
+INSTANCE="$4"
+shift 4
+
+PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+EXEC="$PROJECT_DIR/build/executable"
+
+if [ ! -x "$EXEC" ]; then
+    echo "Executavel nao encontrado ou sem permissao de execucao: $EXEC" >&2
+    exit 1
+fi
+
+OUTPUT=$("$EXEC" --instance "$INSTANCE" --seed "$SEED" "$@" 2>/dev/null)
+STATUS=$?
+
+if [ $STATUS -ne 0 ]; then
+    echo "1000000000"
+    exit 0
+fi
+
+echo "$OUTPUT"
+exit 0

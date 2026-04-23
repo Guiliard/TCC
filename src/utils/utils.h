@@ -9,6 +9,8 @@
 #define INT_MAX __INT_MAX__
 #define FLT_MAX	__FLT_MAX__
 
+#define INSTANCE_NAME_SIZE 128
+
 #define PERCENT_OF_PRIZE 0.2
 #define MAX_ITER 100
 #define ALPHA 0.1f
