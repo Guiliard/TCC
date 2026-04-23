@@ -3,8 +3,6 @@
 #include "metrics/metrics.h"
 
 int main(int argc, char *argv[]) {
-    // srand(time(NULL));
-
     char instance[INSTANCE_NAME_SIZE] = "rbg403";
     float alpha = 0.3f;
     int max_iter = 100;
