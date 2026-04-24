@@ -36,9 +36,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    printf("\n-----------------------------------------------------------\n");
-    printf(" -Prob inst.: %s\n", fname);
-
     snprintf(pname, sizeof(pname), "../dataset/%s/%s_N.pctsp", fname, fname);
     int n = carregaParN(pname);
 
@@ -66,8 +63,6 @@ int main(int argc, char *argv[])
     liberaMatriz(c, n);
     free(p);
     free(w);
-
-    printf(" -FIM\n-----------------------------------------------------------\n");
 
     return 0;
 }

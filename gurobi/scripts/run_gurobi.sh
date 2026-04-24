@@ -5,7 +5,9 @@ set -euo pipefail
 EXEC="./build/rscpGRB"
 DATASET_DIR="../dataset"
 RESULTS_DIR="results"
+
 TSV_FILE="$RESULTS_DIR/gurobi_results.tsv"
+TABLE_FILE="$RESULTS_DIR/gurobi_results_formatted.txt"
 
 mkdir -p "$RESULTS_DIR"
 
@@ -21,7 +23,7 @@ for instance_path in "$DATASET_DIR"/*; do
     instance=$(basename "$instance_path")
 
     for g in 2 5 8; do
-        echo "Rodando instancia=$instance g=$g"
+        echo "Rodando instancia = $instance g = $g"
 
         "$EXEC" "$g" "$instance"
 
@@ -39,5 +41,8 @@ for instance_path in "$DATASET_DIR"/*; do
     done
 done
 
+column -t -s $'\t' "$TSV_FILE" > "$TABLE_FILE"
+
 echo
-echo "Resultados salvos em: $TSV_FILE"
+echo "TSV salvo em: $TSV_FILE"
+echo "Tabela formatada salva em: $TABLE_FILE"
