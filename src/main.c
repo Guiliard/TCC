@@ -7,6 +7,8 @@ int main(int argc, char *argv[]) {
     float alpha = 0.3f;
     int max_iter = 100;
     int selection = CANDIDATE_SELECTION_ORDERED;
+    int g_level = 2;
+    float percent_of_prize = 0.2f;
     unsigned int seed = 12345;
 
     for (int i = 1; i < argc; i++) {
@@ -40,6 +42,23 @@ int main(int argc, char *argv[]) {
         else if (strcmp(argv[i], "--seed") == 0 && i + 1 < argc) {
             seed = (unsigned int) atoi(argv[++i]);
         }
+        else if (strcmp(argv[i], "--g") == 0 && i + 1 < argc) {
+            g_level = atoi(argv[++i]);
+
+            if (g_level == 2) {
+                percent_of_prize = 0.2f;
+            }
+            else if (g_level == 5) {
+                percent_of_prize = 0.5f;
+            }
+            else if (g_level == 8) {
+                percent_of_prize = 0.8f;
+            }
+            else {
+                fprintf(stderr, "Erro: --g deve ser 2, 5 ou 8\n");
+                return 1;
+            }
+        }
         else {
             fprintf(stderr, "Argumento invalido: %s\n", argv[i]);
             return 1;
@@ -72,7 +91,7 @@ int main(int argc, char *argv[]) {
     solution* sol = NULL;
     metrics* m = create_metrics();
 
-    prob = init_environment(n_file, p_file, w_file, c_file);
+    prob = init_environment(n_file, p_file, w_file, c_file, percent_of_prize);
 
     start_metrics(m);
 
@@ -80,7 +99,8 @@ int main(int argc, char *argv[]) {
 
     stop_metrics(m);
 
-    printf("%.2f\n", sol->total_cost);
+    // printf("%.2f\n", sol->total_cost);
+    print_report(instance, prob, sol, m->elapsed_time, alpha, max_iter, selection);
 
     free_problem(prob);
     free_solution(sol);

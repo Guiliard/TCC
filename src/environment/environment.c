@@ -52,7 +52,7 @@ void initialize_alpha(problem *prob) {
     prob->alpha = total_sum + sum_n_largest;
 }
 
-problem* init_environment(char *number_file, char *prize_file, char* penalty_file, char *distance_file) {
+problem* init_environment(char *number_file, char *prize_file, char* penalty_file, char *distance_file, float percent_of_prize) {
     problem* prob = allocate_vector(sizeof(problem), 1);
 
     char* number_content = read_file((char*)number_file);
@@ -61,7 +61,7 @@ problem* init_environment(char *number_file, char *prize_file, char* penalty_fil
     char* distance_content = read_file((char*)distance_file);
 
     prob->total_prize = 0;
-    prob->percent_of_prize = PERCENT_OF_PRIZE;
+    prob->percent_of_prize = percent_of_prize;
     prob->num_all_cities = atoi(number_content);
     prob->all_cities = allocate_vector(sizeof(city), prob->num_all_cities);
     prob->asymmetric_distances = allocate_matrix(prob->num_all_cities, prob->num_all_cities);
