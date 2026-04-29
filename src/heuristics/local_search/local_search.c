@@ -1,7 +1,6 @@
 #include "local_search.h"
 
 problem *global_prob = NULL;
-int global_dist = 0;
 
 int compare_parameter_asc(const void *a, const void *b)
 {
@@ -107,98 +106,320 @@ void select_candidates(int *candidates, int num_candidates, int selection, int (
     }
 }
 
-float find_best_insertion_position(problem *prob, solution *sol, int city_k_id, int *best_position)
+void rebuild_city_pos_in_tour(problem *prob, solution *sol)
 {
-    float best_delta = FLT_MAX;
+    for (int i = 0; i < prob->num_all_cities; i++) {
+        sol->city_pos_in_tour[i] = -1;
+    }
+
+    for (int i = 0; i < sol->tour_size - 1; i++) {
+        sol->city_pos_in_tour[sol->tour[i]] = i;
+    }
+}
+
+float find_best_insertion_position(problem *prob, solution *sol, int selection, int *best_city_id, int *best_position, int *best_dist_delta) 
+{
+    *best_city_id = -1;
     *best_position = -1;
+    *best_dist_delta = 0;
+
+    float best_delta = 0.0f;
+
+    int *candidates = allocate_vector(sizeof(int), prob->num_all_cities - sol->num_visited_cities);
+    int num_candidates = 0;
+
+    for (int i = 0; i < prob->num_all_cities; i++) {
+        if (sol->city_pos_in_visited[i] == -1) {
+            candidates[num_candidates++] = i;
+        }
+    }
+
+    if (num_candidates == 0) {
+        free(candidates);
+        return best_delta;
+    }
+
+    global_prob = prob;
+    select_candidates(candidates, num_candidates, selection, compare_parameter_desc);
 
     int **dist = prob->asymmetric_distances;
     int *tour = sol->tour;
-    int penalty_k = prob->all_cities[city_k_id].penalty;
 
-    int prev = tour[0];
+    for (int c = 0; c < num_candidates; c++) {
+        int city_k_id = candidates[c];
+        int penalty_k = prob->all_cities[city_k_id].penalty;
 
-    for (int i = 0; i < sol->tour_size - 1; i++) {
+        for (int pos = 0; pos < sol->tour_size - 1; pos++) {
+            int city_i = tour[pos];
+            int city_j = tour[pos + 1];
 
-        int next = tour[i + 1];
+            int dist_delta = dist[city_i][city_k_id] + dist[city_k_id][city_j] - dist[city_i][city_j];
 
-        int d_ij = dist[prev][next];
-        int d_ik = dist[prev][city_k_id];
-        int d_kj = dist[city_k_id][next];
+            float delta = (float)dist_delta - penalty_k;
 
-        int dist_delta = d_ik + d_kj - d_ij;
-        float delta = (float)dist_delta - penalty_k;
+            if (delta < best_delta) {
+                best_delta = delta;
+                *best_city_id = city_k_id;
+                *best_position = pos;
+                *best_dist_delta = dist_delta;
+            }
+        }
+    }
+
+    free(candidates);
+    global_prob = NULL;
+
+    return best_delta;
+}
+
+float find_best_drop_position(problem *prob, solution *sol, int selection, int *best_city_id, int *best_position, int *best_dist_delta) 
+{
+    *best_city_id = -1;
+    *best_position = -1;
+    *best_dist_delta = 0;
+
+    float best_delta = 0.0f;
+
+    int *candidates = allocate_vector(sizeof(int), sol->num_visited_cities);
+    int num_candidates = 0;
+
+    for (int i = 1; i < sol->num_visited_cities; i++) {
+        int city_id = sol->visited_cities[i].id;
+        int new_prize = sol->prize_goal - sol->visited_cities[i].prize;
+
+        if (new_prize >= prob->min_prize_goal) {
+            candidates[num_candidates++] = city_id;
+        }
+    }
+
+    if (num_candidates == 0) {
+        free(candidates);
+        return best_delta;
+    }
+
+    global_prob = prob;
+    select_candidates(candidates, num_candidates, selection, compare_parameter_asc);
+
+    int **dist = prob->asymmetric_distances;
+    int *tour = sol->tour;
+
+    for (int c = 0; c < num_candidates; c++) {
+        int city_k_id = candidates[c];
+        int pos = sol->city_pos_in_tour[city_k_id];
+
+        if (pos <= 0 || pos >= sol->tour_size - 1) {
+            continue;
+        }
+
+        int city_i = tour[pos - 1];
+        int city_j = tour[pos + 1];
+
+        int dist_delta =
+            dist[city_i][city_j] -
+            dist[city_i][city_k_id] -
+            dist[city_k_id][city_j];
+
+        int penalty_k = prob->all_cities[city_k_id].penalty;
+
+        float delta = (float)dist_delta + penalty_k;
 
         if (delta < best_delta) {
             best_delta = delta;
-            global_dist = dist_delta;
-            *best_position = i;
+            *best_city_id = city_k_id;
+            *best_position = pos;
+            *best_dist_delta = dist_delta;
         }
+    }
 
-        prev = next;
+    free(candidates);
+    global_prob = NULL;
+
+    return best_delta;
+}
+
+float find_best_swap_position(problem *prob, solution *sol, int selection, int *best_city_in_id, int *best_city_out_id, int *best_position, int *best_new_prize_goal, int *best_dist_delta) 
+{
+    *best_city_in_id = -1;
+    *best_city_out_id = -1;
+    *best_position = -1;
+    *best_new_prize_goal = sol->prize_goal;
+    *best_dist_delta = 0;
+
+    float best_delta = 0.0f;
+
+    int *outside_candidates = allocate_vector(sizeof(int), prob->num_all_cities - sol->num_visited_cities);
+    int num_outside = 0;
+
+    for (int i = 0; i < prob->num_all_cities; i++) {
+        if (sol->city_pos_in_visited[i] == -1) {
+            outside_candidates[num_outside++] = i;
+        }
+    }
+
+    int *inside_candidates = allocate_vector(sizeof(int), sol->num_visited_cities - 1);
+    int num_inside = 0;
+
+    for (int i = 1; i < sol->num_visited_cities; i++) {
+        inside_candidates[num_inside++] = sol->visited_cities[i].id;
+    }
+
+    if (num_outside == 0 || num_inside == 0) {
+        free(outside_candidates);
+        free(inside_candidates);
+        return best_delta;
+    }
+
+    global_prob = prob;
+
+    select_candidates(outside_candidates, num_outside, selection, compare_parameter_desc);
+    select_candidates(inside_candidates, num_inside, selection, compare_parameter_asc);
+
+    int **dist = prob->asymmetric_distances;
+    int *tour = sol->tour;
+
+    for (int o = 0; o < num_outside; o++) {
+        int city_k_id = outside_candidates[o];
+        int prize_k = prob->all_cities[city_k_id].prize;
+        int penalty_k = prob->all_cities[city_k_id].penalty;
+
+        for (int i = 0; i < num_inside; i++) {
+            int city_r_id = inside_candidates[i];
+            int prize_r = prob->all_cities[city_r_id].prize;
+            int penalty_r = prob->all_cities[city_r_id].penalty;
+
+            int new_prize_goal = sol->prize_goal - prize_r + prize_k;
+
+            if (new_prize_goal < prob->min_prize_goal) {
+                continue;
+            }
+
+            int pos = sol->city_pos_in_tour[city_r_id];
+
+            if (pos <= 0 || pos >= sol->tour_size - 1) {
+                continue;
+            }
+
+            int city_i = tour[pos - 1];
+            int city_j = tour[pos + 1];
+
+            int dist_delta =
+                dist[city_i][city_k_id] +
+                dist[city_k_id][city_j] -
+                dist[city_i][city_r_id] -
+                dist[city_r_id][city_j];
+
+            float delta = (float)dist_delta + (penalty_r - penalty_k);
+
+            if (delta < best_delta) {
+                best_delta = delta;
+                *best_city_in_id = city_k_id;
+                *best_city_out_id = city_r_id;
+                *best_position = pos;
+                *best_new_prize_goal = new_prize_goal;
+                *best_dist_delta = dist_delta;
+            }
+        }
+    }
+
+    free(outside_candidates);
+    free(inside_candidates);
+    global_prob = NULL;
+
+    return best_delta;
+}
+
+float find_best_two_opt_position(problem *prob, solution *sol, int *best_i, int *best_j)
+{
+    float best_delta = 0.0f;
+
+    *best_i = -1;
+    *best_j = -1;
+
+    int *tour = sol->tour;
+    int **dist = prob->asymmetric_distances;
+
+    for (int left = 1; left < sol->tour_size - 2; left++) {
+        for (int right = left + 1; right < sol->tour_size - 1; right++) {
+            double old_cost = 0.0;
+            double new_cost = 0.0;
+
+            int before = left - 1;
+            int after = right + 1;
+
+            old_cost += dist[tour[before]][tour[left]];
+
+            for (int i = left; i < right; i++) {
+                old_cost += dist[tour[i]][tour[i + 1]];
+            }
+
+            old_cost += dist[tour[right]][tour[after]];
+
+            new_cost += dist[tour[before]][tour[right]];
+
+            for (int i = right; i > left; i--) {
+                new_cost += dist[tour[i]][tour[i - 1]];
+            }
+
+            new_cost += dist[tour[left]][tour[after]];
+
+            float delta = (float)(new_cost - old_cost);
+
+            if (delta < best_delta) {
+                best_delta = delta;
+                *best_i = left;
+                *best_j = right;
+            }
+        }
     }
 
     return best_delta;
 }
 
-float find_best_drop_position(problem *prob, solution *sol, int city_k_id, int *best_position)
+float find_best_relocate_position(problem *prob, solution *sol, int *best_from, int *best_to)
 {
+    float best_delta = 0.0f;
+
+    *best_from = -1;
+    *best_to = -1;
+
     int *tour = sol->tour;
     int **dist = prob->asymmetric_distances;
 
-    int pos = sol->city_pos_in_tour[city_k_id];
+    for (int from = 1; from < sol->tour_size - 1; from++) {
+        int city = tour[from];
 
-    if (pos == -1) {
-        *best_position = -1;
-        return FLT_MAX;
+        int prev = tour[from - 1];
+        int next = tour[from + 1];
+
+        float remove_delta =
+            dist[prev][next]
+            - dist[prev][city]
+            - dist[city][next];
+
+        for (int to = 0; to < sol->tour_size - 1; to++) {
+            if (to == from || to == from - 1) {
+                continue;
+            }
+
+            int insert_after = tour[to];
+            int insert_before = tour[to + 1];
+
+            float insert_delta =
+                dist[insert_after][city]
+                + dist[city][insert_before]
+                - dist[insert_after][insert_before];
+
+            float delta = remove_delta + insert_delta;
+
+            if (delta < best_delta) {
+                best_delta = delta;
+                *best_from = from;
+                *best_to = to;
+            }
+        }
     }
 
-    *best_position = pos;
-
-    int city_i_id = tour[pos - 1];
-    int city_j_id = tour[pos + 1];
-
-    int d_ij = dist[city_i_id][city_j_id];
-    int d_ik = dist[city_i_id][city_k_id];
-    int d_kj = dist[city_k_id][city_j_id];
-
-    int penalty_k = prob->all_cities[city_k_id].penalty;
-
-    int dist_delta = d_ij - d_ik - d_kj;
-    global_dist = dist_delta;
-
-    return (float)dist_delta + penalty_k;
-}
-
-float find_best_swap_position(problem *prob, solution *sol, int city_k_id, int city_r_id, int *best_position)
-{
-    int *tour = sol->tour;
-    int **dist = prob->asymmetric_distances;
-
-    int pos = sol->city_pos_in_tour[city_r_id];
-
-    if (pos == -1) {
-        *best_position = -1;
-        return FLT_MAX;
-    }
-
-    *best_position = pos;
-    
-    int city_i_id = tour[pos - 1];
-    int city_j_id = tour[pos + 1];
-
-    int penalty_k = prob->all_cities[city_k_id].penalty;
-    int penalty_r = prob->all_cities[city_r_id].penalty;
-
-    int d_ik = dist[city_i_id][city_k_id];
-    int d_kj = dist[city_k_id][city_j_id];
-    int d_ir = dist[city_i_id][city_r_id];
-    int d_rj = dist[city_r_id][city_j_id];
-
-    int dist_delta = d_ik + d_kj - d_ir - d_rj;
-    global_dist = dist_delta;
-
-    return (float)dist_delta + (penalty_r - penalty_k);
+    return best_delta;
 }
 
 void insert_city_in_tour(solution *sol, int city_k_id, int insert_after_pos)
@@ -232,250 +453,221 @@ void swap_city_in_tour(solution *sol, int city_k_id, int position_to_replace)
     sol->tour[position_to_replace] = city_k_id;
 }
 
+void reverse_tour_segment(solution *sol, int left, int right)
+{
+    while (left < right) {
+        int tmp = sol->tour[left];
+        sol->tour[left] = sol->tour[right];
+        sol->tour[right] = tmp;
+
+        left++;
+        right--;
+    }
+}
+
+void relocate_city_in_tour(solution *sol, int from, int to)
+{
+    int city = sol->tour[from];
+
+    memmove(
+        sol->tour + from,
+        sol->tour + from + 1,
+        (sol->tour_size - from - 1) * sizeof(int)
+    );
+
+    if (to > from) {
+        to--;
+    }
+
+    memmove(
+        sol->tour + to + 2,
+        sol->tour + to + 1,
+        (sol->tour_size - to - 2) * sizeof(int)
+    );
+
+    sol->tour[to + 1] = city;
+}
+
 void insertion_move(problem *prob, solution *sol, int selection)
 {
-    int *candidates = allocate_vector(sizeof(int), prob->num_all_cities - sol->num_visited_cities);
-    int num_candidates = 0;
+    int best_city_id = -1;
+    int best_position = -1;
+    int best_dist_delta = 0;
 
-    for(int i = 0; i < prob->num_all_cities; i++) {
-        if(sol->city_pos_in_visited[i] == -1) {
-            candidates[num_candidates++] = i;
-        }
+    float best_delta = find_best_insertion_position(
+        prob,
+        sol,
+        selection,
+        &best_city_id,
+        &best_position,
+        &best_dist_delta
+    );
+
+    if (best_delta < 0.0f && best_city_id != -1 && best_position >= 0) {
+        city selected_city = prob->all_cities[best_city_id];
+
+        city *tmp = realloc(sol->visited_cities, (sol->num_visited_cities + 1) * sizeof(city));
+
+        sol->visited_cities = tmp;
+        sol->visited_cities[sol->num_visited_cities] = selected_city;
+        sol->num_visited_cities++;
+
+        sol->city_pos_in_visited[best_city_id] = sol->num_visited_cities - 1;
+
+        insert_city_in_tour(sol, best_city_id, best_position);
+        rebuild_city_pos_in_tour(prob, sol);
+
+        sol->prize_goal += selected_city.prize;
+        sol->total_cost += best_delta;
+        sol->tour_cost += best_dist_delta;
     }
-
-    global_prob = prob;
-    
-    select_candidates(candidates, num_candidates, selection, compare_parameter_desc);
-
-    for(int c = 0; c < num_candidates; c++) {
-        int city_k_id = candidates[c];
-
-        int best_position = -1;
-        float best_delta = find_best_insertion_position(prob, sol, city_k_id, &best_position);
-
-        if (best_delta < 0.0f && best_position >= 0) {
-            city c = prob->all_cities[city_k_id];
-
-            city *tmp = realloc(sol->visited_cities, (sol->num_visited_cities + 1) * sizeof(city));
-
-            sol->visited_cities = tmp;
-
-            sol->visited_cities[sol->num_visited_cities] = c;
-            sol->num_visited_cities++;
-            
-            sol->city_pos_in_visited[city_k_id] = sol->num_visited_cities - 1;
-
-            insert_city_in_tour(sol, city_k_id, best_position);
-
-            for(int i = best_position + 2; i < sol->tour_size; i++) {
-                sol->city_pos_in_tour[sol->tour[i]] = i;
-            }
-
-            sol->city_pos_in_tour[city_k_id] = best_position + 1;
-
-            sol->prize_goal += c.prize;
-            sol->total_cost += best_delta;
-            sol->tour_cost += global_dist;
-
-            free(candidates);
-
-            global_dist = 0;
-            global_prob = NULL;
-
-            return;
-        }
-    }
-    
-    free(candidates);
-
-    global_dist = 0;
-    global_prob = NULL;
 }
 
 void drop_move(problem *prob, solution *sol, int selection)
 {
-    int *candidates = allocate_vector(sizeof(int), sol->num_visited_cities);
-    int num_candidates = 0;
+    int best_city_id = -1;
+    int best_position = -1;
+    int best_dist_delta = 0;
 
-    for(int i = 1; i < sol->num_visited_cities; i++) {
-        int new_prize = sol->prize_goal - sol->visited_cities[i].prize;
+    float best_delta = find_best_drop_position(
+        prob,
+        sol,
+        selection,
+        &best_city_id,
+        &best_position,
+        &best_dist_delta
+    );
 
-        if(new_prize >= prob->min_prize_goal) {
-            candidates[num_candidates++] = sol->visited_cities[i].id;
-        }
-    }
+    if (best_delta < 0.0f && best_city_id != -1 && best_position >= 1) {
+        int remove_idx = sol->city_pos_in_visited[best_city_id];
 
-    if(num_candidates == 0) {
-        free(candidates);
-        return;
-    }
-
-    global_prob = prob;
-    
-    select_candidates(candidates, num_candidates, selection, compare_parameter_asc);
-
-    for(int c = 0; c < num_candidates; c++) {
-        int city_k_id = candidates[c];
-
-        int best_position = -1;
-        float best_delta = find_best_drop_position(prob, sol, city_k_id, &best_position);
-
-        if (best_delta < 0.0f && best_position >= 1) {
-            int remove_idx = -1;
-
-            remove_idx = sol->city_pos_in_visited[city_k_id];
-
-            if (remove_idx == -1) continue;
-
-            memmove(
-                sol->visited_cities + remove_idx,
-                sol->visited_cities + remove_idx + 1,
-                (sol->num_visited_cities - remove_idx - 1) * sizeof(city)
-            );
-
-            sol->num_visited_cities--;
-
-            for(int i = remove_idx; i < sol->num_visited_cities; i++) {
-                sol->city_pos_in_visited[sol->visited_cities[i].id] = i;
-            }
-
-            sol->city_pos_in_visited[city_k_id] = -1;
-
-            drop_city_from_tour(sol, best_position);
-
-            for(int i = best_position; i < sol->tour_size; i++) {
-                sol->city_pos_in_tour[sol->tour[i]] = i;
-            }
-
-            sol->city_pos_in_tour[city_k_id] = -1;
-
-            city c = prob->all_cities[city_k_id];
-
-            sol->prize_goal -= c.prize;
-            sol->total_cost += best_delta;
-            sol->tour_cost += global_dist;
-
-            free(candidates);
-
-            global_dist = 0;
-            global_prob = NULL;
-
+        if (remove_idx == -1) {
             return;
         }
+
+        city removed_city = prob->all_cities[best_city_id];
+
+        memmove(
+            sol->visited_cities + remove_idx,
+            sol->visited_cities + remove_idx + 1,
+            (sol->num_visited_cities - remove_idx - 1) * sizeof(city)
+        );
+
+        sol->num_visited_cities--;
+
+        for (int i = remove_idx; i < sol->num_visited_cities; i++) {
+            sol->city_pos_in_visited[sol->visited_cities[i].id] = i;
+        }
+
+        sol->city_pos_in_visited[best_city_id] = -1;
+
+        drop_city_from_tour(sol, best_position);
+        rebuild_city_pos_in_tour(prob, sol);
+
+        sol->prize_goal -= removed_city.prize;
+        sol->total_cost += best_delta;
+        sol->tour_cost += best_dist_delta;
     }
-
-    free(candidates);
-
-    global_dist = 0;
-    global_prob = NULL;
 }
 
 void swap_move(problem *prob, solution *sol, int selection)
 {
-    int *outside_candidates = allocate_vector(sizeof(int), prob->num_all_cities - sol->num_visited_cities);
-    int num_outside = 0;
+    int best_city_in_id = -1;
+    int best_city_out_id = -1;
+    int best_position = -1;
+    int best_new_prize_goal = sol->prize_goal;
+    int best_dist_delta = 0;
 
-    for(int i = 0; i < prob->num_all_cities; i++) {
-        if(sol->city_pos_in_visited[i] == -1) {
-            outside_candidates[num_outside++] = i;
+    float best_delta = find_best_swap_position(
+        prob,
+        sol,
+        selection,
+        &best_city_in_id,
+        &best_city_out_id,
+        &best_position,
+        &best_new_prize_goal,
+        &best_dist_delta
+    );
+
+    if (best_delta < 0.0f && best_city_in_id != -1 && best_city_out_id != -1) {
+        int pos_v = sol->city_pos_in_visited[best_city_out_id];
+
+        if (pos_v == -1) {
+            return;
         }
+
+        sol->visited_cities[pos_v] = prob->all_cities[best_city_in_id];
+
+        sol->city_pos_in_visited[best_city_out_id] = -1;
+        sol->city_pos_in_visited[best_city_in_id] = pos_v;
+
+        swap_city_in_tour(sol, best_city_in_id, best_position);
+        rebuild_city_pos_in_tour(prob, sol);
+
+        sol->prize_goal = best_new_prize_goal;
+        sol->total_cost += best_delta;
+        sol->tour_cost += best_dist_delta;
     }
+}
 
-    int *inside_candidates = allocate_vector(sizeof(int), sol->num_visited_cities - 1);
-    int num_inside = 0;
+void two_opt_move(problem *prob, solution *sol)
+{
+    int best_i = -1;
+    int best_j = -1;
 
-    for(int i = 1; i < sol->num_visited_cities; i++) {
-        inside_candidates[num_inside++] = sol->visited_cities[i].id;
+    float best_delta = find_best_two_opt_position(prob, sol, &best_i, &best_j);
+
+    if (best_delta < 0.0f && best_i >= 1 && best_j >= best_i) {
+        reverse_tour_segment(sol, best_i, best_j);
+
+        sol->tour_cost += best_delta;
+        sol->total_cost += best_delta;
+        
+        rebuild_city_pos_in_tour(prob, sol);
     }
+}
 
-    if(num_outside == 0 || num_inside == 0) {
-        free(outside_candidates);
-        free(inside_candidates);
-        return;
+void relocate_move(problem *prob, solution *sol)
+{
+    int best_from = -1;
+    int best_to = -1;
+
+    float best_delta = find_best_relocate_position(prob, sol, &best_from, &best_to);
+
+    if (best_delta < 0.0f && best_from >= 1 && best_to >= 0) {
+        relocate_city_in_tour(sol, best_from, best_to);
+
+        sol->tour_cost += best_delta;
+        sol->total_cost += best_delta;
+
+        rebuild_city_pos_in_tour(prob, sol);
     }
-
-    global_prob = prob;
-
-    select_candidates(outside_candidates, num_outside, selection, compare_parameter_desc);
-    select_candidates(inside_candidates, num_inside, selection, compare_parameter_asc);
-
-    city *cities = prob->all_cities;
-    city *visited = sol->visited_cities;
-
-    int outside_size = num_outside;
-    int inside_size = num_inside;
-
-    for(int o = 0; o < outside_size; o++) {
-
-        int city_k_id = outside_candidates[o];
-        int new_prize = cities[city_k_id].prize;
-
-        for(int i = 0; i < inside_size; i++) {
-
-            int city_r_id = inside_candidates[i];
-            int old_prize = cities[city_r_id].prize;
-
-            int new_prize_goal = sol->prize_goal - old_prize + new_prize;
-
-            if(new_prize_goal < prob->min_prize_goal) continue;
-
-            int best_position = -1;
-            float best_delta = find_best_swap_position(prob, sol, city_k_id, city_r_id, &best_position);
-
-            if(best_delta < 0.0f && best_position >= 1) {
-                int pos_v = sol->city_pos_in_visited[city_r_id];
-
-                visited[pos_v] = cities[city_k_id];
-
-                sol->city_pos_in_visited[city_r_id] = -1;
-                sol->city_pos_in_visited[city_k_id] = pos_v;
-                
-                swap_city_in_tour(sol, city_k_id, best_position);
-
-                sol->city_pos_in_tour[city_r_id] = -1;
-                sol->city_pos_in_tour[city_k_id] = best_position;
-                
-                sol->prize_goal = new_prize_goal;
-                sol->total_cost += best_delta;
-                sol->tour_cost += global_dist;
-
-                free(outside_candidates);
-                free(inside_candidates);
-
-                global_dist = 0;
-                global_prob = NULL;
-
-                return;
-            }
-        }
-    }
-
-    free(outside_candidates);
-    free(inside_candidates);
-
-    global_dist = 0;
-    global_prob = NULL;
 }
 
 void vnd(problem *prob, solution *sol, int selection)
 {
     int k = 1;
 
-    while(k <= 3) {
-
+    while (k <= 5) {
         float cost_before = sol->total_cost;
 
-        if(k == 1) {
+        if (k == 1) {
             insertion_move(prob, sol, selection);
         }
-        else if(k == 2) {
+        else if (k == 2) {
             swap_move(prob, sol, selection);
         }
-        else if(k == 3) {
+        else if (k == 3) {
+            two_opt_move(prob, sol);
+        }
+        else if (k == 4) {
+            relocate_move(prob, sol);
+        }
+        else if (k == 5) {
             drop_move(prob, sol, selection);
         }
-        
-        if(sol->total_cost < cost_before) {
+
+        if (sol->total_cost < cost_before) {
             k = 1;
         } else {
             k++;

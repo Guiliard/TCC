@@ -4,7 +4,7 @@ solution* grasp(problem* prob, int max_iter, float alpha, int candidate_selectio
     solution* best_sol = NULL;
 
     for (int i = 0; i < max_iter; i++) {
-        solution* current_sol = build_initial_solution_grasp(prob, alpha);
+        solution* current_sol = build_initial_solution_grasp(prob, alpha, i);
         vnd(prob, current_sol, candidate_selection_strategy);
 
         if (best_sol == NULL || current_sol->total_cost < best_sol->total_cost) {
@@ -20,7 +20,7 @@ solution* grasp(problem* prob, int max_iter, float alpha, int candidate_selectio
     return best_sol;
 }
 
-solution* build_initial_solution_grasp(problem *prob, float alpha) {
+solution* build_initial_solution_grasp(problem *prob, float alpha, int iteration) {
     solution* sol = allocate_vector(sizeof(solution), 1);
 
     bool *visited = allocate_vector(sizeof(bool), prob->num_all_cities);
@@ -39,7 +39,7 @@ solution* build_initial_solution_grasp(problem *prob, float alpha) {
     visited[0] = true;
 
     while (total_prize < capacity && count < prob->num_all_cities) {
-        int last_city = selected[count-1].id;
+        // int last_city = selected[count-1].id;
         
         float best = -FLT_MAX;
         float worst = FLT_MAX;
@@ -48,8 +48,8 @@ solution* build_initial_solution_grasp(problem *prob, float alpha) {
             values[i] = -FLT_MAX;
 
             if (!visited[i]) {
-                //float p = prob->all_cities[i].parameter;
-                float p = calculate_greedy_value(prob, last_city, i);
+                float p = prob->all_cities[i].parameter;
+                // float p = calculate_greedy_value(prob, last_city, i);
 
                 values[i] = p;
 
@@ -114,11 +114,19 @@ solution* build_initial_solution_grasp(problem *prob, float alpha) {
     sol->tour_cost = 0.0;
     sol->city_pos_in_visited = positions_in_visited;
     sol->city_pos_in_tour = NULL;
+    sol->total_cost = 0.0;
 
-    convert_to_symmetric(prob, sol);
-    solve_tsp_with_concorde(sol);
-    convert_to_asymmetric(sol);
-    convert_tour_to_min_cost(prob, sol);
+    // convert_to_symmetric(prob, sol);
+    // solve_tsp_with_concorde(sol);
+    // convert_to_asymmetric(sol);
+    // convert_tour_to_min_cost(prob, sol);
+
+    if (iteration % 2 == 0) {
+        solve_tsp_with_nearest_neighbor(prob, sol);
+    } else {
+        solve_tsp_with_cheapest_insertion(prob, sol);
+    }
+
     calculate_objective_function(prob, sol);
 
     return sol;

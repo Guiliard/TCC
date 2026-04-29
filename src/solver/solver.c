@@ -81,3 +81,131 @@ void solve_tsp_with_concorde(solution *sol) {
     sol->tour = tour_concorde;
     sol->tour_size = num_nodes;
 }
+
+void solve_tsp_with_nearest_neighbor(problem *prob, solution *sol) {
+    int n = sol->num_visited_cities;
+
+    bool *used = allocate_vector(sizeof(bool), n);
+    int *tour = allocate_vector(sizeof(int), n + 1);
+    int *positions_in_tour = allocate_vector(sizeof(int), prob->num_all_cities);
+
+    for (int i = 0; i < prob->num_all_cities; i++) {
+        positions_in_tour[i] = -1;
+    }
+
+    int current_pos = 0;
+    used[current_pos] = true;
+    tour[0] = sol->visited_cities[current_pos].id;
+    positions_in_tour[tour[0]] = 0;
+
+    for (int k = 1; k < n; k++) {
+        int current_city = sol->visited_cities[current_pos].id;
+
+        int best_pos = -1;
+        int best_dist = INT_MAX;
+
+        for (int i = 0; i < n; i++) {
+            if (!used[i]) {
+                int candidate_city = sol->visited_cities[i].id;
+                int dist = prob->asymmetric_distances[current_city][candidate_city];
+
+                if (dist < best_dist) {
+                    best_dist = dist;
+                    best_pos = i;
+                }
+            }
+        }
+
+        if (best_pos == -1) {
+            break;
+        }
+
+        used[best_pos] = true;
+        current_pos = best_pos;
+        tour[k] = sol->visited_cities[current_pos].id;
+        positions_in_tour[tour[k]] = k;
+    }
+
+    tour[n] = tour[0];
+
+    sol->tour = tour;
+    sol->tour_size = n + 1;
+    sol->tour_cost = calculate_tour_cost(sol->tour_size, prob->asymmetric_distances, sol->tour);
+    sol->city_pos_in_tour = positions_in_tour;
+
+    free(used);
+}
+
+void solve_tsp_with_cheapest_insertion(problem *prob, solution *sol) {
+    int n = sol->num_visited_cities;
+
+    bool *inserted = allocate_vector(sizeof(bool), n);
+    int *tour = allocate_vector(sizeof(int), n + 1);
+    int *positions_in_tour = allocate_vector(sizeof(int), prob->num_all_cities);
+
+    for (int i = 0; i < prob->num_all_cities; i++) {
+        positions_in_tour[i] = -1;
+    }
+
+    tour[0] = sol->visited_cities[0].id;
+    inserted[0] = true;
+    int second_pos = 1;
+    tour[1] = sol->visited_cities[second_pos].id;
+    tour[2] = tour[0];
+    inserted[second_pos] = true;
+    int tour_size = 3;
+
+    while (tour_size < n + 1) {
+        int best_city_pos = -1;
+        int best_insert_after = -1;
+        int best_delta = INT_MAX;
+
+        for (int city_pos = 0; city_pos < n; city_pos++) {
+            if (inserted[city_pos]) {
+                continue;
+            }
+
+            int city_k = sol->visited_cities[city_pos].id;
+
+            for (int pos = 0; pos < tour_size - 1; pos++) {
+                int city_i = tour[pos];
+                int city_j = tour[pos + 1];
+
+                int delta = prob->asymmetric_distances[city_i][city_k] + prob->asymmetric_distances[city_k][city_j] - prob->asymmetric_distances[city_i][city_j];
+
+                if (delta < best_delta) {
+                    best_delta = delta;
+                    best_city_pos = city_pos;
+                    best_insert_after = pos;
+                }
+            }
+        }
+
+        if (best_city_pos == -1 || best_insert_after == -1) {
+            break;
+        }
+
+        memmove(
+            tour + best_insert_after + 2,
+            tour + best_insert_after + 1,
+            (tour_size - best_insert_after - 1) * sizeof(int)
+        );
+
+        tour[best_insert_after + 1] = sol->visited_cities[best_city_pos].id;
+        inserted[best_city_pos] = true;
+        tour_size++;
+    }
+
+    for (int i = 0; i < tour_size; i++) {
+        positions_in_tour[tour[i]] = i;
+    }
+
+    positions_in_tour[tour[0]] = 0;
+
+    sol->tour = tour;
+    sol->tour_size = tour_size;
+    sol->tour_cost = calculate_tour_cost(sol->tour_size, prob->asymmetric_distances, sol->tour);
+    sol->city_pos_in_tour = positions_in_tour;
+
+    free(inserted);
+}
