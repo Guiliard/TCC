@@ -1,6 +1,39 @@
 #include "solver.h"
 
-void solve_tsp_with_concorde(solution *sol) {
+int *build_initial_symmetric_tour_from_solution(solution *sol)
+{
+    int n = sol->num_visited_cities;
+    int num_nodes = 2 * n;
+
+    int *initial_tour = allocate_vector(sizeof(int), num_nodes);
+
+    int idx = 0;
+
+    for (int t = 0; t < sol->tour_size - 1; t++) {
+        int current_city = sol->tour[t];
+        int next_city = sol->tour[t + 1];
+
+        int current_pos = sol->city_pos_in_visited[current_city];
+        int next_pos = sol->city_pos_in_visited[next_city];
+
+        if (current_pos < 0 || current_pos >= n || next_pos < 0 || next_pos >= n) {
+            free(initial_tour);
+            return NULL;
+        }
+
+        initial_tour[idx++] = current_pos;
+        initial_tour[idx++] = next_pos + n;
+    }
+
+    if (idx != num_nodes) {
+        free(initial_tour);
+        return NULL;
+    }
+
+    return initial_tour;
+}
+
+int solve_tsp_with_concorde(solution *sol) {
     CCdatagroup dat;
     CCrandstate rstate;
 
@@ -12,10 +45,11 @@ void solve_tsp_with_concorde(solution *sol) {
     int silent = 1;
 
     int *tour_concorde = (int *)allocate_vector(sizeof(int), num_nodes);
+    int *initial_tour = build_initial_symmetric_tour_from_solution(sol);
 
     char *name = "my_tsp";
     
-    double timebound = 3600.0;
+    double timebound = TIME_LIMIT_CONCORDE;
 
     CCutil_init_datagroup(&dat);
     
@@ -45,8 +79,10 @@ void solve_tsp_with_concorde(solution *sol) {
         free(adj);
         free(elist);
         free(elen);
+        free(tour_concorde);
+        free(initial_tour);
 
-        exit(1);
+        return 0;
     }
 
     CCutil_sprand(42, &rstate);
@@ -58,7 +94,7 @@ void solve_tsp_with_concorde(solution *sol) {
     dup2(devnull, STDOUT_FILENO);
     dup2(devnull, STDERR_FILENO);
     
-    int result = CCtsp_solve_dat(num_nodes, &dat, NULL, tour_concorde, NULL, &optval, &success, &foundtour, name, &timebound, &hit_timebound, silent, &rstate);
+    int result = CCtsp_solve_dat(num_nodes, &dat, initial_tour, tour_concorde, NULL, &optval, &success, &foundtour, name, &timebound, &hit_timebound, silent, &rstate);
 
     fflush(stdout);
     fflush(stderr);
@@ -71,15 +107,24 @@ void solve_tsp_with_concorde(solution *sol) {
     close(saved_stderr);
 
     if (result != 0 || !foundtour) {
-        exit(1);
+        free(adj);
+        free(elist);
+        free(elen);
+        free(tour_concorde);
+        free(initial_tour);
+        return 0;
     }
     
     free(adj);
     free(elist);
     free(elen);
+    free(initial_tour);
 
+    free(sol->tour);
     sol->tour = tour_concorde;
     sol->tour_size = num_nodes;
+
+    return 1;
 }
 
 void solve_tsp_with_nearest_neighbor(problem *prob, solution *sol) {

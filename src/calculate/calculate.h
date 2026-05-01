@@ -3,7 +3,6 @@
 
 #include "../utils/utils.h"
 
-float calculate_greedy_value(problem *prob, int last_city, int candidate_city);
 float calculate_average_distance(problem *prob, int city_index);
 float calculate_city_parameter(problem *prob, int city_index);
 float calculate_total_penalty(city *all_cities,  int tour_size, int num_all_cities, int *tour);

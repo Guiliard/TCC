@@ -1,26 +1,62 @@
 #include "construction.h"
 
-solution* grasp(problem* prob, int max_iter, float alpha, int candidate_selection_strategy) {
+solution* grasp(problem* prob, int max_iter, float alpha, int candidate_selection_strategy) 
+{
     solution* best_sol = NULL;
 
     for (int i = 0; i < max_iter; i++) {
-        solution* current_sol = build_initial_solution_grasp(prob, alpha, i);
-        vnd(prob, current_sol, candidate_selection_strategy);
+        int solver_type = (i % 2 == 0) ? SOLVER_NEAREST : SOLVER_CHEAPEST;
 
-        if (best_sol == NULL || current_sol->total_cost < best_sol->total_cost) {
+        solution* current_solution = build_initial_solution_grasp(prob, alpha, solver_type);
+        solution* ls_current_solution = local_search(prob, current_solution, candidate_selection_strategy);
+
+        free_solution(current_solution);
+
+        if (best_sol == NULL || ls_current_solution->total_cost < best_sol->total_cost) {
             if (best_sol != NULL) {
                 free_solution(best_sol);
             }
-            best_sol = current_sol;
+            best_sol = ls_current_solution;
         } else {
-            free_solution(current_sol);
+            free_solution(ls_current_solution);
+        }
+    }
+
+    if (best_sol != NULL) {
+        double old_tour_cost = best_sol->tour_cost;
+        float old_total_cost = best_sol->total_cost;
+        int old_tour_size = best_sol->tour_size;
+
+        int *old_tour = allocate_vector(sizeof(int), old_tour_size);
+        memcpy(old_tour, best_sol->tour, old_tour_size * sizeof(int));
+
+        convert_to_symmetric(prob, best_sol);
+
+        if (solve_tsp_with_concorde(best_sol)) {
+            convert_to_asymmetric(best_sol);
+            convert_tour_to_min_cost(prob, best_sol);
+            calculate_objective_function(prob, best_sol);
+
+            if (best_sol->total_cost > old_total_cost) {
+                free(best_sol->tour);
+                best_sol->tour = old_tour;
+                best_sol->tour_size = old_tour_size;
+                best_sol->tour_cost = old_tour_cost;
+                best_sol->total_cost = old_total_cost;
+                rebuild_city_pos_in_tour(prob, best_sol);
+            } else {
+                free(old_tour);
+            }
+        } else {
+            free(old_tour);
         }
     }
 
     return best_sol;
 }
 
-solution* build_initial_solution_grasp(problem *prob, float alpha, int iteration) {
+solution* build_initial_solution_grasp(problem *prob, float alpha, int solver_type) 
+{
     solution* sol = allocate_vector(sizeof(solution), 1);
 
     bool *visited = allocate_vector(sizeof(bool), prob->num_all_cities);
@@ -39,8 +75,6 @@ solution* build_initial_solution_grasp(problem *prob, float alpha, int iteration
     visited[0] = true;
 
     while (total_prize < capacity && count < prob->num_all_cities) {
-        // int last_city = selected[count-1].id;
-        
         float best = -FLT_MAX;
         float worst = FLT_MAX;
 
@@ -49,7 +83,6 @@ solution* build_initial_solution_grasp(problem *prob, float alpha, int iteration
 
             if (!visited[i]) {
                 float p = prob->all_cities[i].parameter;
-                // float p = calculate_greedy_value(prob, last_city, i);
 
                 values[i] = p;
 
@@ -116,12 +149,7 @@ solution* build_initial_solution_grasp(problem *prob, float alpha, int iteration
     sol->city_pos_in_tour = NULL;
     sol->total_cost = 0.0;
 
-    // convert_to_symmetric(prob, sol);
-    // solve_tsp_with_concorde(sol);
-    // convert_to_asymmetric(sol);
-    // convert_tour_to_min_cost(prob, sol);
-
-    if (iteration % 2 == 0) {
+    if (solver_type == SOLVER_NEAREST) {
         solve_tsp_with_nearest_neighbor(prob, sol);
     } else {
         solve_tsp_with_cheapest_insertion(prob, sol);

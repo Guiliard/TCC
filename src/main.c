@@ -99,8 +99,8 @@ int main(int argc, char *argv[]) {
 
     stop_metrics(m);
 
-    // printf("%.2f\n", sol->total_cost);
-    print_report(instance, prob, sol, m->elapsed_time, alpha, max_iter, selection);
+    printf("%.2f\n", sol->total_cost);
+    // print_report(instance, prob, sol, m->elapsed_time, alpha, max_iter, selection);
 
     free_problem(prob);
     free_solution(sol);

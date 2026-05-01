@@ -12,12 +12,25 @@
 #define INSTANCE_NAME_SIZE 128
 
 #define PERCENT_OF_PRIZE 0.2
+
 #define MAX_ITER 100
+
 #define ALPHA 0.1f
 
-#define CANDIDATE_SELECTION_ORDERED 0
-#define CANDIDATE_SELECTION_RANDOM 1
-#define CANDIDATE_SELECTION_ROULETTE 2
+#define CANDIDATE_SELECTION_ORDERED     0
+#define CANDIDATE_SELECTION_RANDOM      1
+#define CANDIDATE_SELECTION_ROULETTE    2
+
+#define SOLVER_NEAREST   0
+#define SOLVER_CHEAPEST  1
+
+#define MOVE_INSERTION 1
+#define MOVE_SWAP      2
+#define MOVE_TWO_OPT   3
+#define MOVE_RELOCATE  4
+#define MOVE_DROP      5
+
+#define TIME_LIMIT_CONCORDE 60.0
 
 typedef struct city {
 	int id;
@@ -72,6 +85,8 @@ void print_solution(solution *sol);
 
 void free_problem(problem *prob);
 void free_solution(solution *sol);
+
+solution *copy_solution(problem *prob, solution *src);
 
 void print_report(const char *instance_name, problem *prob, solution *sol, double execution_time, float alpha, int num_iterations, int candidate_selection_type);
 

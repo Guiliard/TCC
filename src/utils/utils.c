@@ -110,6 +110,33 @@ void free_solution(solution *sol) {
     free(sol);
 }
 
+solution *copy_solution(problem *prob, solution *src)
+{
+    solution *copy = allocate_vector(sizeof(solution), 1);
+
+    copy->num_visited_cities = src->num_visited_cities;
+    copy->symmetric_distances = NULL;
+    copy->symmetric_distances_size = 0;
+    copy->tour_size = src->tour_size;
+    copy->tour_cost = src->tour_cost;
+    copy->prize_goal = src->prize_goal;
+    copy->total_cost = src->total_cost;
+
+    copy->visited_cities = allocate_vector(sizeof(city), src->num_visited_cities);
+    memcpy(copy->visited_cities, src->visited_cities, src->num_visited_cities * sizeof(city));
+
+    copy->tour = allocate_vector(sizeof(int), src->tour_size);
+    memcpy(copy->tour, src->tour, src->tour_size * sizeof(int));
+
+    copy->city_pos_in_visited = allocate_vector(sizeof(int), prob->num_all_cities);
+    memcpy(copy->city_pos_in_visited, src->city_pos_in_visited, prob->num_all_cities * sizeof(int));
+
+    copy->city_pos_in_tour = allocate_vector(sizeof(int), prob->num_all_cities);
+    memcpy(copy->city_pos_in_tour, src->city_pos_in_tour, prob->num_all_cities * sizeof(int));
+
+    return copy;
+}
+
 void print_report(const char *instance_name, problem *prob, solution *sol, double execution_time, float alpha, int num_iterations, int candidate_selection_type)
 {
     const char *selection_type_str = "UNKNOWN";

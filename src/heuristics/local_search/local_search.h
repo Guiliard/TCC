@@ -8,6 +8,8 @@
 #include "../../convert/asymmetric.h"
 #include "../../calculate/calculate.h"
 
+void swap_int(int *a, int *b);
+
 int compare_parameter_asc(const void *a, const void *b);
 int compare_parameter_desc(const void *a, const void *b);
 
@@ -35,6 +37,9 @@ void swap_move(problem* prob, solution* sol, int selection);
 void two_opt_move(problem* prob, solution* sol);
 void relocate_move(problem* prob, solution* sol);
 
-void vnd(problem* prob, solution* sol, int selection);
+void vnd(problem *prob, solution *sol, int selection, int *order);
+
+solution* permutations_recursive(problem *prob, solution *base_sol, int selection, int *order, int left, int right, float *best_cost, int *best_order, solution *best_sol);
+solution* local_search(problem* prob, solution* sol, int selection);
 
 #endif

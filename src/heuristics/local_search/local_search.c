@@ -2,6 +2,13 @@
 
 problem *global_prob = NULL;
 
+void swap_int(int *a, int *b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
 int compare_parameter_asc(const void *a, const void *b)
 {
     int city_a = *(int*)a;
@@ -53,6 +60,15 @@ void roulette_select(int *candidates, int num_candidates)
             if(!used[i]) {
                 remaining_parameter += global_prob->all_cities[candidates[i]].parameter;
             }
+        }
+
+        if (remaining_parameter <= 0.0f) {
+            shuffle_array(candidates, num_candidates);
+
+            free(selected);
+            free(used);
+
+            return;
         }
 
         float random_value = ((float)rand() / RAND_MAX) * remaining_parameter;
@@ -644,33 +660,80 @@ void relocate_move(problem *prob, solution *sol)
     }
 }
 
-void vnd(problem *prob, solution *sol, int selection)
+void vnd(problem *prob, solution *sol, int selection, int *order)
 {
-    int k = 1;
+    int k = 0;
 
-    while (k <= 5) {
+    while (k < 5) {
         float cost_before = sol->total_cost;
 
-        if (k == 1) {
+        if (order[k] == MOVE_INSERTION) {
             insertion_move(prob, sol, selection);
         }
-        else if (k == 2) {
+        else if (order[k] == MOVE_SWAP) {
             swap_move(prob, sol, selection);
         }
-        else if (k == 3) {
+        else if (order[k] == MOVE_TWO_OPT) {
             two_opt_move(prob, sol);
         }
-        else if (k == 4) {
+        else if (order[k] == MOVE_RELOCATE) {
             relocate_move(prob, sol);
         }
-        else if (k == 5) {
+        else if (order[k] == MOVE_DROP) {
             drop_move(prob, sol, selection);
         }
 
         if (sol->total_cost < cost_before) {
-            k = 1;
+            k = 0;
         } else {
             k++;
         }
     }
+}
+
+solution *permutations_recursive(problem *prob, solution *base_sol, int selection, int *order, int left, int right, float *best_cost, int *best_order, solution *best_sol) 
+{
+    if (left == right) {
+        solution *test_sol = copy_solution(prob, base_sol);
+
+        vnd(prob, test_sol, selection, order);
+
+        if (test_sol->total_cost < *best_cost) {
+            *best_cost = test_sol->total_cost;
+            memcpy(best_order, order, 5 * sizeof(int));
+
+            if (best_sol != NULL) {
+                free_solution(best_sol);
+            }
+
+            best_sol = test_sol;
+        } else {
+            free_solution(test_sol);
+        }
+
+        return best_sol;
+    }
+
+    for (int i = left; i <= right; i++) {
+        swap_int(&order[left], &order[i]);
+
+        best_sol = permutations_recursive(prob, base_sol, selection, order, left + 1, right, best_cost, best_order, best_sol);
+
+        swap_int(&order[left], &order[i]);
+    }
+
+    return best_sol;
+}
+
+solution* local_search(problem *prob, solution *sol, int selection)
+{
+    int order[5] = {MOVE_INSERTION, MOVE_SWAP, MOVE_TWO_OPT, MOVE_RELOCATE, MOVE_DROP};
+
+    int best_order[5];
+    float best_cost = FLT_MAX;
+    solution *best_sol = NULL;
+
+    best_sol = permutations_recursive(prob, sol, selection, order, 0, 4, &best_cost, best_order, best_sol);
+
+    return best_sol;
 }

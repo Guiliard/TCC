@@ -27,6 +27,7 @@ void convert_tour_to_min_cost(problem *prob, solution *sol) {
         positions_in_tour[city_id] = i;
     }
 
+    free(sol->city_pos_in_tour);
     sol->city_pos_in_tour = positions_in_tour;
     
     free(reverse_tour);
