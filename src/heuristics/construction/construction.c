@@ -14,7 +14,7 @@ solution* grasp(problem *prob, int max_iter, float alpha, int candidate_selectio
     {
         int tid = omp_get_thread_num();
 
-        #pragma omp for schedule(static)
+        #pragma omp for schedule(dynamic)
         for (int i = 0; i < max_iter; i++) {
             int solver_type = (i % 2 == 0) ? SOLVER_NEAREST : SOLVER_CHEAPEST;
 
