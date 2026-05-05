@@ -687,7 +687,7 @@ void generate_orders_recursive(int *base, int left, int right, int orders[NUM_VN
     }
 }
 
-solution* local_search(problem *prob, solution *sol, int selection)
+solution* local_search_sequential_all_orders(problem *prob, solution *sol, int selection)
 {
     int orders[NUM_VND_ORDERS][5];
 
@@ -702,55 +702,47 @@ solution* local_search(problem *prob, solution *sol, int selection)
     int order_count = 0;
     generate_orders_recursive(base_order, 0, 4, orders, &order_count);
 
-    solution *thread_best_sol[LOCAL_SEARCH_THREADS];
-    float thread_best_cost[LOCAL_SEARCH_THREADS];
+    solution *improved_sol = copy_solution(prob, sol);
 
-    for (int t = 0; t < LOCAL_SEARCH_THREADS; t++) {
-        thread_best_sol[t] = NULL;
-        thread_best_cost[t] = FLT_MAX;
+    for (int i = 0; i < order_count; i++) {
+        vnd(prob, improved_sol, selection, orders[i]);
     }
 
-    #pragma omp parallel num_threads(LOCAL_SEARCH_THREADS)
-    {
-        int tid = omp_get_thread_num();
+    return improved_sol;
+}
 
-        #pragma omp for schedule(static)
-        for (int i = 0; i < order_count; i++) {
-            solution *test_sol = copy_solution(prob, sol);
+solution* local_search_sequential_best_order(problem *prob, solution *sol, int selection)
+{
+    int orders[NUM_VND_ORDERS][5];
 
-            vnd(prob, test_sol, selection, orders[i]);
+    int base_order[5] = {
+        MOVE_INSERTION,
+        MOVE_SWAP,
+        MOVE_TWO_OPT,
+        MOVE_RELOCATE,
+        MOVE_DROP
+    };
 
-            if (test_sol->total_cost < thread_best_cost[tid]) {
-                if (thread_best_sol[tid] != NULL) {
-                    free_solution(thread_best_sol[tid]);
-                }
-
-                thread_best_cost[tid] = test_sol->total_cost;
-                thread_best_sol[tid] = test_sol;
-            } else {
-                free_solution(test_sol);
-            }
-        }
-    }
+    int order_count = 0;
+    generate_orders_recursive(base_order, 0, 4, orders, &order_count);
 
     solution *best_sol = NULL;
     float best_cost = FLT_MAX;
 
-    for (int t = 0; t < LOCAL_SEARCH_THREADS; t++) {
-        if (thread_best_sol[t] != NULL && thread_best_cost[t] < best_cost) {
+    for (int i = 0; i < order_count; i++) {
+        solution *test_sol = copy_solution(prob, sol);
+
+        vnd(prob, test_sol, selection, orders[i]);
+
+        if (test_sol->total_cost < best_cost) {
             if (best_sol != NULL) {
                 free_solution(best_sol);
             }
 
-            best_cost = thread_best_cost[t];
-            best_sol = thread_best_sol[t];
-            thread_best_sol[t] = NULL;
-        }
-    }
-
-    for (int t = 0; t < LOCAL_SEARCH_THREADS; t++) {
-        if (thread_best_sol[t] != NULL) {
-            free_solution(thread_best_sol[t]);
+            best_cost = test_sol->total_cost;
+            best_sol = test_sol;
+        } else {
+            free_solution(test_sol);
         }
     }
 

@@ -1,24 +1,59 @@
 #include "construction.h"
 
-solution* grasp(problem* prob, int max_iter, float alpha, int candidate_selection_strategy) 
+solution* grasp(problem *prob, int max_iter, float alpha, int candidate_selection_strategy)
 {
-    solution* best_sol = NULL;
+    solution *thread_best_sol[LOCAL_SEARCH_THREADS];
+    float thread_best_cost[LOCAL_SEARCH_THREADS];
 
-    for (int i = 0; i < max_iter; i++) {
-        int solver_type = (i % 2 == 0) ? SOLVER_NEAREST : SOLVER_CHEAPEST;
+    for (int t = 0; t < LOCAL_SEARCH_THREADS; t++) {
+        thread_best_sol[t] = NULL;
+        thread_best_cost[t] = FLT_MAX;
+    }
 
-        solution* current_solution = build_initial_solution_grasp(prob, alpha, solver_type);
-        solution* ls_current_solution = local_search(prob, current_solution, candidate_selection_strategy);
+    #pragma omp parallel num_threads(LOCAL_SEARCH_THREADS)
+    {
+        int tid = omp_get_thread_num();
 
-        free_solution(current_solution);
+        #pragma omp for schedule(static)
+        for (int i = 0; i < max_iter; i++) {
+            int solver_type = (i % 2 == 0) ? SOLVER_NEAREST : SOLVER_CHEAPEST;
 
-        if (best_sol == NULL || ls_current_solution->total_cost < best_sol->total_cost) {
+            solution* current_solution = build_initial_solution_grasp(prob, alpha, solver_type);
+            solution* ls_current_solution = local_search_sequential_best_order(prob, current_solution, candidate_selection_strategy);
+
+            free_solution(current_solution);
+
+            if (ls_current_solution->total_cost < thread_best_cost[tid]) {
+                if (thread_best_sol[tid] != NULL) {
+                    free_solution(thread_best_sol[tid]);
+                }
+
+                thread_best_cost[tid] = ls_current_solution->total_cost;
+                thread_best_sol[tid] = ls_current_solution;
+            } else {
+                free_solution(ls_current_solution);
+            }
+        }
+    }
+
+    solution *best_sol = NULL;
+    float best_cost = FLT_MAX;
+
+    for (int t = 0; t < LOCAL_SEARCH_THREADS; t++) {
+        if (thread_best_sol[t] != NULL && thread_best_cost[t] < best_cost) {
             if (best_sol != NULL) {
                 free_solution(best_sol);
             }
-            best_sol = ls_current_solution;
-        } else {
-            free_solution(ls_current_solution);
+
+            best_cost = thread_best_cost[t];
+            best_sol = thread_best_sol[t];
+            thread_best_sol[t] = NULL;
+        }
+    }
+
+    for (int t = 0; t < LOCAL_SEARCH_THREADS; t++) {
+        if (thread_best_sol[t] != NULL) {
+            free_solution(thread_best_sol[t]);
         }
     }
 
@@ -55,7 +90,7 @@ solution* grasp(problem* prob, int max_iter, float alpha, int candidate_selectio
     return best_sol;
 }
 
-solution* build_initial_solution_grasp(problem *prob, float alpha, int solver_type) 
+solution* build_initial_solution_grasp(problem *prob, float alpha, int solver_type)
 {
     solution* sol = allocate_vector(sizeof(solution), 1);
 

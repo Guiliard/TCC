@@ -39,6 +39,8 @@ void relocate_move(problem* prob, solution* sol);
 void vnd(problem *prob, solution *sol, int selection, int *order);
 
 void generate_orders_recursive(int *base, int left, int right, int orders[NUM_VND_ORDERS][5], int *count);
-solution* local_search(problem* prob, solution* sol, int selection);
+
+solution* local_search_sequential_all_orders(problem* prob, solution* sol, int selection);
+solution* local_search_sequential_best_order(problem* prob, solution* sol, int selection);
 
 #endif
