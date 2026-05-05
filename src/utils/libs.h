@@ -12,5 +12,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <linux/limits.h>
+#include <omp.h>
 
 #endif

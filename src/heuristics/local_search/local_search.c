@@ -1,7 +1,5 @@
 #include "local_search.h"
 
-problem *global_prob = NULL;
-
 void swap_int(int *a, int *b)
 {
     int temp = *a;
@@ -9,32 +7,22 @@ void swap_int(int *a, int *b)
     *b = temp;
 }
 
-int compare_parameter_asc(const void *a, const void *b)
+void sort_candidates_by_parameter(problem *prob, int *candidates, int num_candidates, int descending)
 {
-    int city_a = *(int*)a;
-    int city_b = *(int*)b;
+    for (int i = 0; i < num_candidates - 1; i++) {
+        for (int j = i + 1; j < num_candidates; j++) {
+            float pi = prob->all_cities[candidates[i]].parameter;
+            float pj = prob->all_cities[candidates[j]].parameter;
 
-    float pa = global_prob->all_cities[city_a].parameter;
-    float pb = global_prob->all_cities[city_b].parameter;
+            int should_swap = descending ? (pj > pi) : (pj < pi);
 
-    if (pa > pb) return 1;
-    if (pa < pb) return -1;
-
-    return 0;
-}
-
-int compare_parameter_desc(const void *a, const void *b)
-{
-    int city_a = *(int*)a;
-    int city_b = *(int*)b;
-
-    float pa = global_prob->all_cities[city_a].parameter;
-    float pb = global_prob->all_cities[city_b].parameter;
-
-    if (pa < pb) return 1;
-    if (pa > pb) return -1;
-
-    return 0;
+            if (should_swap) {
+                int temp = candidates[i];
+                candidates[i] = candidates[j];
+                candidates[j] = temp;
+            }
+        }
+    }
 }
 
 void shuffle_array(int *array, int size)
@@ -47,50 +35,48 @@ void shuffle_array(int *array, int size)
     }
 }
 
-void roulette_select(int *candidates, int num_candidates)
+void roulette_select(problem *prob, int *candidates, int num_candidates)
 {
     int *selected = allocate_vector(sizeof(int), num_candidates);
     bool *used = allocate_vector(sizeof(bool), num_candidates);
 
-    for(int s = 0; s < num_candidates; s++) {
-
+    for (int s = 0; s < num_candidates; s++) {
         float remaining_parameter = 0.0f;
 
-        for(int i = 0; i < num_candidates; i++) {
-            if(!used[i]) {
-                remaining_parameter += global_prob->all_cities[candidates[i]].parameter;
+        for (int i = 0; i < num_candidates; i++) {
+            if (!used[i]) {
+                remaining_parameter += prob->all_cities[candidates[i]].parameter;
             }
         }
 
         if (remaining_parameter <= 0.0f) {
             shuffle_array(candidates, num_candidates);
-
             free(selected);
             free(used);
-
             return;
         }
 
-        float random_value = ((float)rand() / RAND_MAX) * remaining_parameter;
+        float random_value = ((float) rand() / RAND_MAX) * remaining_parameter;
 
         float cumulative = 0.0f;
         int selected_index = -1;
 
-        for(int i = 0; i < num_candidates; i++) {
+        for (int i = 0; i < num_candidates; i++) {
+            if (used[i]) {
+                continue;
+            }
 
-            if(used[i]) continue;
+            cumulative += prob->all_cities[candidates[i]].parameter;
 
-            cumulative += global_prob->all_cities[candidates[i]].parameter;
-
-            if(cumulative >= random_value) {
+            if (cumulative >= random_value) {
                 selected_index = i;
                 break;
             }
         }
 
-        if(selected_index == -1) {
-            for(int i = 0; i < num_candidates; i++) {
-                if(!used[i]) {
+        if (selected_index == -1) {
+            for (int i = 0; i < num_candidates; i++) {
+                if (!used[i]) {
                     selected_index = i;
                     break;
                 }
@@ -101,23 +87,25 @@ void roulette_select(int *candidates, int num_candidates)
         used[selected_index] = true;
     }
 
-    memcpy(candidates, selected, num_candidates*sizeof(int));
+    memcpy(candidates, selected, num_candidates * sizeof(int));
 
     free(selected);
     free(used);
 }
 
-void select_candidates(int *candidates, int num_candidates, int selection, int (*compar)(const void*, const void*))
+void select_candidates(problem *prob, int *candidates, int num_candidates, int selection, int descending)
 {
     switch (selection) {
         case CANDIDATE_SELECTION_ORDERED:
-            qsort(candidates, num_candidates, sizeof(int), compar);
+            sort_candidates_by_parameter(prob, candidates, num_candidates, descending);
             break;
+
         case CANDIDATE_SELECTION_RANDOM:
             shuffle_array(candidates, num_candidates);
             break;
+
         case CANDIDATE_SELECTION_ROULETTE:
-            roulette_select(candidates, num_candidates);
+            roulette_select(prob, candidates, num_candidates);
             break;
     }
 }
@@ -155,8 +143,7 @@ float find_best_insertion_position(problem *prob, solution *sol, int selection, 
         return best_delta;
     }
 
-    global_prob = prob;
-    select_candidates(candidates, num_candidates, selection, compare_parameter_desc);
+    select_candidates(prob, candidates, num_candidates, selection, 1);
 
     int **dist = prob->asymmetric_distances;
     int *tour = sol->tour;
@@ -183,7 +170,6 @@ float find_best_insertion_position(problem *prob, solution *sol, int selection, 
     }
 
     free(candidates);
-    global_prob = NULL;
 
     return best_delta;
 }
@@ -213,8 +199,7 @@ float find_best_drop_position(problem *prob, solution *sol, int selection, int *
         return best_delta;
     }
 
-    global_prob = prob;
-    select_candidates(candidates, num_candidates, selection, compare_parameter_asc);
+    select_candidates(prob, candidates, num_candidates, selection, 0);
 
     int **dist = prob->asymmetric_distances;
     int *tour = sol->tour;
@@ -248,7 +233,6 @@ float find_best_drop_position(problem *prob, solution *sol, int selection, int *
     }
 
     free(candidates);
-    global_prob = NULL;
 
     return best_delta;
 }
@@ -285,10 +269,8 @@ float find_best_swap_position(problem *prob, solution *sol, int selection, int *
         return best_delta;
     }
 
-    global_prob = prob;
-
-    select_candidates(outside_candidates, num_outside, selection, compare_parameter_desc);
-    select_candidates(inside_candidates, num_inside, selection, compare_parameter_asc);
+    select_candidates(prob, outside_candidates, num_outside, selection, 1);
+    select_candidates(prob, inside_candidates, num_inside, selection, 0);
 
     int **dist = prob->asymmetric_distances;
     int *tour = sol->tour;
@@ -339,7 +321,6 @@ float find_best_swap_position(problem *prob, solution *sol, int selection, int *
 
     free(outside_candidates);
     free(inside_candidates);
-    global_prob = NULL;
 
     return best_delta;
 }
@@ -691,49 +672,87 @@ void vnd(problem *prob, solution *sol, int selection, int *order)
     }
 }
 
-solution *permutations_recursive(problem *prob, solution *base_sol, int selection, int *order, int left, int right, float *best_cost, int *best_order, solution *best_sol) 
+void generate_orders_recursive(int *base, int left, int right, int orders[NUM_VND_ORDERS][5], int *count)
 {
     if (left == right) {
-        solution *test_sol = copy_solution(prob, base_sol);
-
-        vnd(prob, test_sol, selection, order);
-
-        if (test_sol->total_cost < *best_cost) {
-            *best_cost = test_sol->total_cost;
-            memcpy(best_order, order, 5 * sizeof(int));
-
-            if (best_sol != NULL) {
-                free_solution(best_sol);
-            }
-
-            best_sol = test_sol;
-        } else {
-            free_solution(test_sol);
-        }
-
-        return best_sol;
+        memcpy(orders[*count], base, 5 * sizeof(int));
+        (*count)++;
+        return;
     }
 
     for (int i = left; i <= right; i++) {
-        swap_int(&order[left], &order[i]);
-
-        best_sol = permutations_recursive(prob, base_sol, selection, order, left + 1, right, best_cost, best_order, best_sol);
-
-        swap_int(&order[left], &order[i]);
+        swap_int(&base[left], &base[i]);
+        generate_orders_recursive(base, left + 1, right, orders, count);
+        swap_int(&base[left], &base[i]);
     }
-
-    return best_sol;
 }
 
 solution* local_search(problem *prob, solution *sol, int selection)
 {
-    int order[5] = {MOVE_INSERTION, MOVE_SWAP, MOVE_TWO_OPT, MOVE_RELOCATE, MOVE_DROP};
+    int orders[NUM_VND_ORDERS][5];
 
-    int best_order[5];
-    float best_cost = FLT_MAX;
+    int base_order[5] = {
+        MOVE_INSERTION,
+        MOVE_SWAP,
+        MOVE_TWO_OPT,
+        MOVE_RELOCATE,
+        MOVE_DROP
+    };
+
+    int order_count = 0;
+    generate_orders_recursive(base_order, 0, 4, orders, &order_count);
+
+    solution *thread_best_sol[LOCAL_SEARCH_THREADS];
+    float thread_best_cost[LOCAL_SEARCH_THREADS];
+
+    for (int t = 0; t < LOCAL_SEARCH_THREADS; t++) {
+        thread_best_sol[t] = NULL;
+        thread_best_cost[t] = FLT_MAX;
+    }
+
+    #pragma omp parallel num_threads(LOCAL_SEARCH_THREADS)
+    {
+        int tid = omp_get_thread_num();
+
+        #pragma omp for schedule(static)
+        for (int i = 0; i < order_count; i++) {
+            solution *test_sol = copy_solution(prob, sol);
+
+            vnd(prob, test_sol, selection, orders[i]);
+
+            if (test_sol->total_cost < thread_best_cost[tid]) {
+                if (thread_best_sol[tid] != NULL) {
+                    free_solution(thread_best_sol[tid]);
+                }
+
+                thread_best_cost[tid] = test_sol->total_cost;
+                thread_best_sol[tid] = test_sol;
+            } else {
+                free_solution(test_sol);
+            }
+        }
+    }
+
     solution *best_sol = NULL;
+    float best_cost = FLT_MAX;
 
-    best_sol = permutations_recursive(prob, sol, selection, order, 0, 4, &best_cost, best_order, best_sol);
+    for (int t = 0; t < LOCAL_SEARCH_THREADS; t++) {
+        if (thread_best_sol[t] != NULL && thread_best_cost[t] < best_cost) {
+            if (best_sol != NULL) {
+                free_solution(best_sol);
+            }
+
+            best_cost = thread_best_cost[t];
+            best_sol = thread_best_sol[t];
+            thread_best_sol[t] = NULL;
+        }
+    }
+
+    for (int t = 0; t < LOCAL_SEARCH_THREADS; t++) {
+        if (thread_best_sol[t] != NULL) {
+            free_solution(thread_best_sol[t]);
+        }
+    }
 
     return best_sol;
 }

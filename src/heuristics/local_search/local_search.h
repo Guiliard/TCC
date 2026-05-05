@@ -10,12 +10,11 @@
 
 void swap_int(int *a, int *b);
 
-int compare_parameter_asc(const void *a, const void *b);
-int compare_parameter_desc(const void *a, const void *b);
-
+void sort_candidates_by_parameter(problem *prob, int *candidates, int num_candidates, int descending);
 void shuffle_array(int *array, int size);
-void roulette_select(int *candidates, int num_candidates);
-void select_candidates(int *candidates, int num_candidates, int selection, int (*compar)(const void*, const void*));
+void roulette_select(problem *prob, int *candidates, int num_candidates);
+
+void select_candidates(problem *prob, int *candidates, int num_candidates, int selection, int descending);
 
 void rebuild_city_pos_in_tour(problem *prob, solution *sol);
 
@@ -39,7 +38,7 @@ void relocate_move(problem* prob, solution* sol);
 
 void vnd(problem *prob, solution *sol, int selection, int *order);
 
-solution* permutations_recursive(problem *prob, solution *base_sol, int selection, int *order, int left, int right, float *best_cost, int *best_order, solution *best_sol);
+void generate_orders_recursive(int *base, int left, int right, int orders[NUM_VND_ORDERS][5], int *count);
 solution* local_search(problem* prob, solution* sol, int selection);
 
 #endif
