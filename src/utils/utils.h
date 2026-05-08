@@ -32,7 +32,7 @@
 
 #define TIME_LIMIT_CONCORDE 60.0
 
-#define LOCAL_SEARCH_THREADS 6
+#define LOCAL_SEARCH_THREADS 7
 #define NUM_VND_ORDERS 120
 
 typedef struct city {

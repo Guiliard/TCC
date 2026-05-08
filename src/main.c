@@ -100,6 +100,7 @@ int main(int argc, char *argv[]) {
     stop_metrics(m);
 
     printf("%.2f\n", sol->total_cost);
+    printf("%.2f\n", m->elapsed_time);
     // print_report(instance, prob, sol, m->elapsed_time, alpha, max_iter, selection);
 
     free_problem(prob);
