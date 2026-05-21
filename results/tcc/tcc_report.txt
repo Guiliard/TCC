@@ -1,0 +1,7 @@
+Resumo TCC
+====================
+Arquivo bruto: /home/rafael_moreira/code/TCC/results/tcc/tcc_raw_results.tsv
+Arquivo resumido TSV: /home/rafael_moreira/code/TCC/results/tcc/tcc_summary_results.tsv
+Total instancia-g avaliados: 252
+Comparações com Gurobi: 252
+TCC mais rápido que Gurobi: 139
