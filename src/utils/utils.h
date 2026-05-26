@@ -32,7 +32,6 @@
 
 #define TIME_LIMIT_CONCORDE 60.0
 
-#define LOCAL_SEARCH_THREADS 7
 #define NUM_VND_ORDERS 120
 
 typedef struct city {
@@ -76,6 +75,8 @@ typedef struct solution {
 
     float total_cost;
 } solution;
+
+int get_num_threads(void);
 
 void *allocate_vector(size_t element_size, size_t count);
 int **allocate_matrix(int num_rows, int num_cols);

@@ -2,15 +2,17 @@
 
 solution* grasp(problem *prob, int max_iter, float alpha, int candidate_selection_strategy)
 {
-    solution *thread_best_sol[LOCAL_SEARCH_THREADS];
-    float thread_best_cost[LOCAL_SEARCH_THREADS];
+    int local_search_threads = get_num_threads();
 
-    for (int t = 0; t < LOCAL_SEARCH_THREADS; t++) {
+    solution *thread_best_sol[local_search_threads];
+    float thread_best_cost[local_search_threads];
+
+    for (int t = 0; t < local_search_threads; t++) {
         thread_best_sol[t] = NULL;
         thread_best_cost[t] = FLT_MAX;
     }
 
-    #pragma omp parallel num_threads(LOCAL_SEARCH_THREADS)
+    #pragma omp parallel num_threads(local_search_threads)
     {
         int tid = omp_get_thread_num();
 
@@ -39,7 +41,7 @@ solution* grasp(problem *prob, int max_iter, float alpha, int candidate_selectio
     solution *best_sol = NULL;
     float best_cost = FLT_MAX;
 
-    for (int t = 0; t < LOCAL_SEARCH_THREADS; t++) {
+    for (int t = 0; t < local_search_threads; t++) {
         if (thread_best_sol[t] != NULL && thread_best_cost[t] < best_cost) {
             if (best_sol != NULL) {
                 free_solution(best_sol);
@@ -51,7 +53,7 @@ solution* grasp(problem *prob, int max_iter, float alpha, int candidate_selectio
         }
     }
 
-    for (int t = 0; t < LOCAL_SEARCH_THREADS; t++) {
+    for (int t = 0; t < local_search_threads; t++) {
         if (thread_best_sol[t] != NULL) {
             free_solution(thread_best_sol[t]);
         }

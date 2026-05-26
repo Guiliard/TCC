@@ -1,5 +1,32 @@
 #include "utils.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
+int get_num_threads(void) {
+    int num_threads = 1;
+
+#ifdef _WIN32
+    SYSTEM_INFO sysinfo;
+    GetSystemInfo(&sysinfo);
+    num_threads = (int)sysinfo.dwNumberOfProcessors;
+#else
+    long cores = sysconf(_SC_NPROCESSORS_ONLN);
+    if (cores > 0) {
+        num_threads = (int)cores;
+    }
+#endif
+
+    if (num_threads > 1) {
+        return num_threads - 1;
+    }
+
+    return 1;
+}
+
 void *allocate_vector(size_t element_size, size_t count) {
     void *vector = calloc(count, element_size);
 
