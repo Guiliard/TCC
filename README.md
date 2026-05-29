@@ -70,11 +70,15 @@ O projeto foi desenvolvido em linguagem C utilizando:
 ```bash
 cd concorde
 
+make clean 2>/dev/null || true
+
 ./configure --with-qsopt="$(realpath ../qsopt/lib)"
 
 make
 
 cd ..
+
+grep "LPSOLVER_INTERFACE" concorde/LP/Makefile
 ```
 
 ---
