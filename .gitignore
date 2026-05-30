@@ -1,43 +1,10 @@
 .vscode
+
+# TCC build
 build
 
 # Gurobi build
 guroby/build
 
-# Concorde build
-concorde/**/*.o
-concorde/**/*.a
-
-# Executáveis do Concorde
-concorde/TSP/concorde
-concorde/LINKERN/linkern
-concorde/EDGEGEN/edgegen
-concorde/FMATCH/fmatch
-concorde/CUT/mincut
-concorde/LOCALCUT/localcut
-concorde/TOOLS/edge2len
-concorde/TOOLS/edgunion
-concorde/TOOLS/fconvert
-concorde/TOOLS/prob2tsp
-concorde/TOOLS/showres
-concorde/TOOLS/tourchk
-concorde/TOOLS/tourlen
-
-# Logs e arquivos temporários
-concorde/config.log
-concorde/config.status
-concorde/autom4te.cache/
-
-# Arquivos gerados pelo configure
-concorde/INCLUDE/config.h
-concorde/INCLUDE/config.h.in
-
-# Arquivos de solução
-*.sav
-*.sol
-*.pul
-*.mas
-*.res
-*.log
-
+# CPLEX build
 cplex
