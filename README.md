@@ -72,7 +72,7 @@ cd concorde
 
 make clean 2>/dev/null || true
 
-./configure --with-qsopt="$(realpath ../qsopt/lib)"
+./configure --with-qsopt="$(realpath ../qsopt)" || ./configure --with-cplex="$(realpath ../cplex)"
 
 make
 
@@ -87,7 +87,7 @@ grep "LPSOLVER_INTERFACE" concorde/LP/Makefile
 
 ```bash
 make clean
-make
+make LP_SOLVER=QSOPT || make LP_SOLVER=CPLEX
 ```
 
 O executável será gerado em:
