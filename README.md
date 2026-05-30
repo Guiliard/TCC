@@ -72,6 +72,8 @@ cd concorde
 
 make clean 2>/dev/null || true
 
+chmod +x configure
+
 ./configure --with-qsopt="$(realpath ../qsopt)" || ./configure --with-cplex="$(realpath ../cplex)"
 
 make
