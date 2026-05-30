@@ -8,3 +8,31 @@ guroby/build
 
 # CPLEX build
 cplex
+
+#Concorde build
+concorde/**/Makefile
+
+concorde/INCLUDE/Makefile.common
+concorde/INCLUDE/config.h
+
+concorde/config.cache
+concorde/config.log
+concorde/config.status
+
+concorde/**/*.o
+concorde/**/*.a
+
+concorde/CUT/mincut
+concorde/EDGEGEN/edgegen
+concorde/FMATCH/fmatch
+concorde/LINKERN/linkern
+concorde/LOCALCUT/localcut
+concorde/TOOLS/edg2len
+concorde/TOOLS/edgunion
+concorde/TOOLS/fconvert
+concorde/TOOLS/prob2tsp
+concorde/TOOLS/showres
+concorde/TOOLS/tourchk
+concorde/TOOLS/tourlen
+concorde/TSP/concorde
+concorde/concorde.h
