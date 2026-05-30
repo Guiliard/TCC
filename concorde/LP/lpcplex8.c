@@ -174,11 +174,13 @@ int CClp_init (CClp **lp)
     }
 #endif
 
-    rval = CPXsetintparam ((*lp)->cplex_env, CPX_PARAM_FASTMIP, 1);
-    if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_FASTMIP failed\n");
-        goto CLEANUP;
-    }
+    #ifdef CPX_PARAM_FASTMIP
+        rval = CPXsetintparam ((*lp)->cplex_env, CPX_PARAM_FASTMIP, 1);
+        if (rval) {
+            fprintf (stderr, "CPXsetintparam CPX_PARAM_FASTMIP failed\n");
+            goto CLEANUP;
+        }
+    #endif
 
     rval = CPXsetintparam ((*lp)->cplex_env, CPX_PARAM_ADVIND, 1);
     if (rval) {
@@ -1586,9 +1588,9 @@ int CClp_dump_lp (CClp *lp, const char *fname)
     strncpy (nambuf, fname, sizeof (nambuf));
     nambuf[sizeof(nambuf)-1] = '\0';
 
-    rval = CPXsavwrite (lp->cplex_env, lp->cplex_lp, nambuf);
+    rval = CPXwriteprob(lp->cplex_env, lp->cplex_lp, nambuf, NULL);
     if (rval) {
-        fprintf (stderr, "CPXsavwrite failed\n");
+        fprintf (stderr, "CPXwriteprob failed\n");
     }
     return rval;
 }
@@ -1918,11 +1920,14 @@ static int set_parameters (CPXENVptr cplex_env, CClp_parameters *params)
         goto CLEANUP;
     }
 
-    rval = CPXsetintparam (cplex_env, CPX_PARAM_FASTMIP, params->fastmip);
-    if (rval) {
-        fprintf (stderr, "CPXsetintparam CPX_PARAM_FASTMIP failed\n");
-        goto CLEANUP;
-    }
+    #ifdef CPX_PARAM_FASTMIP
+        /* CPLEX 22.2 não possui mais CPX_PARAM_FASTMIP */
+        rval = CPXsetintparam (cplex_env, CPX_PARAM_FASTMIP, params->fastmip);
+        if (rval) {
+            fprintf (stderr, "CPX_PARAM_FASTMIP failed\n");
+            goto CLEANUP;
+        }
+    #endif
     rval = CPXsetintparam (cplex_env, CPX_PARAM_ADVIND, params->advind);
     if (rval) {
         fprintf (stderr, "CPXsetintparam CPX_PARAM_ADVIND failed\n");

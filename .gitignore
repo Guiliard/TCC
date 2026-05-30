@@ -36,3 +36,7 @@ concorde/TOOLS/tourchk
 concorde/TOOLS/tourlen
 concorde/TSP/concorde
 concorde/concorde.h
+concorde/*.mas
+concorde/*.sav
+concorde/*.sol
+concorde/*.pul
