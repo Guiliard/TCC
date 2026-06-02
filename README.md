@@ -58,6 +58,7 @@ O projeto foi desenvolvido em linguagem C utilizando:
 - OpenMP
 - Concorde TSP Solver
 - QSopt
+- CPLEX
 - irace (R)
 - Gurobi (opcional)
 
@@ -65,7 +66,21 @@ O projeto foi desenvolvido em linguagem C utilizando:
 
 ## Compilação
 
-### Compilar o Concorde com QSopt
+### Instalar CPLEX
+
+```bash
+
+mkdir -p cplex
+
+# Headers do CPLEX
+ln -sf /opt/ibm/ILOG/CPLEX_Studio222/cplex/include/ilcplex/*.h cplex/
+
+# Biblioteca estática
+ln -sf /opt/ibm/ILOG/CPLEX_Studio222/cplex/lib/x86-64_linux/static_pic/libcplex.a cplex/libcplex.a
+
+```
+
+### Compilar o Concorde com QSopt ou CPLEX
 
 ```bash
 cd concorde
