@@ -19,7 +19,8 @@ double mGG(
     double *nodect,
     char *inst,
     int *stat,
-    double *rtime
+    double *rtime,
+    double *gap
 )
 {
     (void)gmin;
@@ -35,6 +36,8 @@ double mGG(
     double soma_penalidades = 0.0;
     double nodecount = -1.0;
     double runtime = -1.0;
+
+    double mipgap = 0.0;
 
     int status = -1;
     int gmax = 0;
@@ -305,6 +308,11 @@ double mGG(
         goto QUIT;
     }
 
+    error = GRBsetdblparam(GRBgetenv(model), GRB_DBL_PAR_MIPGAP, 1e-7);
+    if (error) {
+        goto QUIT;
+    }
+
     error = GRBoptimize(model);
     if (error) {
         goto QUIT;
@@ -325,6 +333,11 @@ double mGG(
         goto QUIT;
     }
 
+    error = GRBgetdblattr(model, GRB_DBL_ATTR_MIPGAP, &mipgap);
+    if (error) {
+        goto QUIT;
+    }
+
     error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &status);
     if (error) {
         goto QUIT;
@@ -333,6 +346,7 @@ double mGG(
     *nodect = nodecount;
     *rtime = runtime;
     *stat = status;
+    *gap = mipgap;
 
 QUIT:
     free(ind);

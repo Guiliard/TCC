@@ -1,6 +1,6 @@
 CC        := gcc
 CFLAGS    := -Wall -Wextra -O3 -Iinclude -I$(GUROBI_HOME)/include
-LDFLAGS   := -L$(GUROBI_HOME)/lib -lgurobi130 -lm
+LDFLAGS   := -L$(GUROBI_HOME)/lib -lgurobi120 -lm
 
 SRC_DIR   := src
 BUILD_DIR := build/objects

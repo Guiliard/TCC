@@ -9,7 +9,7 @@ void solverGRB(int gmin, int **c, int n, int *p, int g, int *w, char *nameINST)
     int status = 0;
     double runtime = 0.0;
 
-    fostar = mGG(gmin, c, n, p, g, w, &nodect, nameINST, &status, &runtime);
+    fostar = mGG(gmin, c, n, p, g, w, &nodect, nameINST, &status, &runtime, &gap);
 
     imprimRel(fostar, nameINST, "GG", gap, nodect, gmin, status, runtime);
 }

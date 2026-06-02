@@ -15,7 +15,8 @@ double mGG(
 	double *nodect,
 	char *inst,
 	int *stat,
-	double *rtime
+	double *rtime,
+	double *gap
 );
 
 #endif
