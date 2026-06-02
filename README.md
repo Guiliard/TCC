@@ -153,8 +153,20 @@ irace/
 Para instalar o irace no R:
 
 ```bash
+sudo apt update
+
+sudo apt install r-base r-base-dev libuv1-dev
+
 R
-install.packages("irace")
+
+install.packages("fs", repos="https://cloud.r-project.org")
+
+install.packages("irace", repos="https://cloud.r-project.org")
+
+library(irace)
+
+irace_cmdline("--version")
+
 q()
 ```
 
@@ -163,9 +175,11 @@ Execução:
 ```bash
 cd irace
 
+mkdir -p build
+
 chmod +x target-runner
 
-irace --scenario scenario.txt
+Rscript -e 'library(irace); irace::irace_cmdline("--scenario scenario.txt")'
 
 cd ..
 ```

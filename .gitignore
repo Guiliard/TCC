@@ -9,6 +9,9 @@ guroby/build
 # CPLEX build
 cplex
 
+# IRACE build
+irace/build
+
 #Concorde build
 concorde/**/Makefile
 

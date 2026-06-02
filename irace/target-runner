@@ -9,6 +9,8 @@ shift 4
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 EXEC="$PROJECT_DIR/build/executable"
 
+cd "$PROJECT_DIR" || exit 1
+
 INSTANCE="${INSTANCE_WITH_G%:*}"
 G="${INSTANCE_WITH_G#*:}"
 
