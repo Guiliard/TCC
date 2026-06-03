@@ -1,6 +1,7 @@
 CC        := gcc
 CFLAGS    := -Wall -Wextra -O3 -Iinclude -I$(GUROBI_HOME)/include
-LDFLAGS   := -L$(GUROBI_HOME)/lib -lgurobi120 -lm
+# LDFLAGS   := -L$(GUROBI_HOME)/lib -lgurobi130 -lm # Gurobi Optimizer version 13.0.1
+LDFLAGS   := -L$(GUROBI_HOME)/lib -lgurobi120 -lm # Gurobi Optimizer version 12.0.1
 
 SRC_DIR   := src
 BUILD_DIR := build/objects
