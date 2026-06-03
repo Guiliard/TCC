@@ -159,10 +159,10 @@ void imprimRel(
         default: cond = "ERROR_UNKNOWN"; break;
     }
 
-    FILE *arquivo = fopen("Relatorio.rel", "a+");
+    FILE *arquivo = fopen("results/new_results/relatorio.rel", "a+");
 
     if (arquivo == NULL) {
-        fprintf(stderr, "Erro: Relatorio.rel nao pode ser aberto.\n");
+        fprintf(stderr, "Erro: relatorio.rel nao pode ser aberto.\n");
         exit(1);
     }
 

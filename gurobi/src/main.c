@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 #include "hutil.h"
 #include "hgrb.h"
@@ -56,7 +57,7 @@ int main(int argc, char *argv[])
         soma += p[i];
     }
 
-    g = (int)(gmin * soma + 0.5);
+    g = (int)ceil(gmin * soma);
 
     solverGRB((int)(gmin * 10), c, n, p, g, w, fname);
 

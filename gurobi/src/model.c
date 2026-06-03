@@ -348,6 +348,34 @@ double mGG(
     *stat = status;
     *gap = mipgap;
 
+    {
+        FILE *map = fopen("results/new_results/map_solutions.csv", "a+");
+
+        if (map == NULL) {
+            fprintf(stderr, "Erro: map_solutions.csv nao pode ser aberto.\n");
+            goto QUIT;
+        }
+
+        fprintf(map, "%s;%d;%.8f;", inst, gmin, mipgap);
+
+        for (int i = 0; i < n; i++) {
+            double yi = 0.0;
+
+            error = GRBgetdblattrelement(model, GRB_DBL_ATTR_X, Y_INDEX(i, n), &yi);
+            if (error) {
+                fclose(map);
+                goto QUIT;
+            }
+
+            if (yi > 0.5) {
+                fprintf(map, "%d ", i);
+            }
+        }
+
+        fprintf(map, "\n");
+        fclose(map);
+    }
+
 QUIT:
     free(ind);
     free(val);
