@@ -175,7 +175,6 @@ void solve_tsp_with_nearest_neighbor(problem *prob, solution *sol) {
 
     sol->tour = tour;
     sol->tour_size = n + 1;
-    sol->tour_cost = calculate_tour_cost(sol->tour_size, prob->asymmetric_distances, sol->tour);
     sol->city_pos_in_tour = positions_in_tour;
 
     free(used);
@@ -249,7 +248,6 @@ void solve_tsp_with_cheapest_insertion(problem *prob, solution *sol) {
 
     sol->tour = tour;
     sol->tour_size = tour_size;
-    sol->tour_cost = calculate_tour_cost(sol->tour_size, prob->asymmetric_distances, sol->tour);
     sol->city_pos_in_tour = positions_in_tour;
 
     free(inserted);

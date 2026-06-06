@@ -74,12 +74,14 @@ solution* grasp(problem *prob, int max_iter, float alpha, int candidate_selectio
             convert_tour_to_min_cost(prob, best_sol);
             calculate_objective_function(prob, best_sol);
 
-            if (best_sol->total_cost > old_total_cost) {
+            if (best_sol->total_cost >= old_total_cost) {
                 free(best_sol->tour);
+
                 best_sol->tour = old_tour;
                 best_sol->tour_size = old_tour_size;
                 best_sol->tour_cost = old_tour_cost;
                 best_sol->total_cost = old_total_cost;
+                
                 rebuild_city_pos_in_tour(prob, best_sol);
             } else {
                 free(old_tour);

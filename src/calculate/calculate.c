@@ -1,15 +1,20 @@
 #include "calculate.h"
 
 float calculate_average_distance(problem *prob, int city_index) {
-    float sum = 0.0;
+    float outgoing_sum = 0.0;
+    float incoming_sum = 0.0;
 
     for (int j = 0; j < prob->num_all_cities; j++) {
         if (j != city_index) {
-            sum += prob->asymmetric_distances[city_index][j];
+            outgoing_sum += prob->asymmetric_distances[city_index][j];
+            incoming_sum += prob->asymmetric_distances[j][city_index];
         }
     }
 
-    return sum / (prob->num_all_cities - 1);
+    float outgoing_avg = outgoing_sum / (prob->num_all_cities - 1);
+    float incoming_avg = incoming_sum / (prob->num_all_cities - 1);
+
+    return (outgoing_avg + incoming_avg) / 2.0;
 }
 
 float calculate_city_parameter(problem *prob, int city_index) {
@@ -53,6 +58,8 @@ double calculate_tour_cost(int tour_size, int **asymmetric_distances, int *tour)
 }
 
 void calculate_objective_function(problem *prob, solution *sol) {
+    sol->tour_cost = calculate_tour_cost(sol->tour_size, prob->asymmetric_distances, sol->tour);
+    
     float total_penalty = calculate_total_penalty(prob->all_cities, sol->tour_size, prob->num_all_cities, sol->tour);
     float relative_penalty = prob->alpha * max(0, prob->min_prize_goal - sol->prize_goal);
 

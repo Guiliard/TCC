@@ -515,8 +515,8 @@ void insertion_move(problem *prob, solution *sol, int selection)
         rebuild_city_pos_in_tour(prob, sol);
 
         sol->prize_goal += selected_city.prize;
-        sol->total_cost += best_delta;
-        sol->tour_cost += best_dist_delta;
+        
+        calculate_objective_function(prob, sol);
     }
 }
 
@@ -559,11 +559,12 @@ void drop_move(problem *prob, solution *sol, int selection)
         sol->city_pos_in_visited[best_city_id] = -1;
 
         drop_city_from_tour(sol, best_position);
+        
         rebuild_city_pos_in_tour(prob, sol);
 
         sol->prize_goal -= removed_city.prize;
-        sol->total_cost += best_delta;
-        sol->tour_cost += best_dist_delta;
+
+        calculate_objective_function(prob, sol);
     }
 }
 
@@ -599,11 +600,12 @@ void swap_move(problem *prob, solution *sol, int selection)
         sol->city_pos_in_visited[best_city_in_id] = pos_v;
 
         swap_city_in_tour(sol, best_city_in_id, best_position);
+        
         rebuild_city_pos_in_tour(prob, sol);
 
         sol->prize_goal = best_new_prize_goal;
-        sol->total_cost += best_delta;
-        sol->tour_cost += best_dist_delta;
+
+        calculate_objective_function(prob, sol);
     }
 }
 
@@ -616,11 +618,10 @@ void two_opt_move(problem *prob, solution *sol)
 
     if (best_delta < 0.0f && best_i >= 1 && best_j >= best_i) {
         reverse_tour_segment(sol, best_i, best_j);
-
-        sol->tour_cost += best_delta;
-        sol->total_cost += best_delta;
         
         rebuild_city_pos_in_tour(prob, sol);
+
+        calculate_objective_function(prob, sol);
     }
 }
 
@@ -634,10 +635,9 @@ void relocate_move(problem *prob, solution *sol)
     if (best_delta < 0.0f && best_from >= 1 && best_to >= 0) {
         relocate_city_in_tour(sol, best_from, best_to);
 
-        sol->tour_cost += best_delta;
-        sol->total_cost += best_delta;
-
         rebuild_city_pos_in_tour(prob, sol);
+
+        calculate_objective_function(prob, sol);
     }
 }
 
