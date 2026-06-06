@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-PROJECT_DIR="/home/rafael_moreira/code/TCC"
+PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
 EXEC="$PROJECT_DIR/build/executable"
 DATASET_DIR="$PROJECT_DIR/dataset"
 
