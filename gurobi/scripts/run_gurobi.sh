@@ -45,7 +45,7 @@ for instance_path in "$DATASET_DIR"/*; do
     done
 done
 
-column -t -s $'\t' "$TSV_FILE" > "$TABLE_FILE"
+cd ..
 
 echo
 echo "TSV salvo em: $TSV_FILE"
