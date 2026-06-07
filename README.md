@@ -200,7 +200,12 @@ pip install -r requirements.txt
 
 Para treinar os modelos:
 ```bash
-python3 train_models.py
+python3 models.py
+```
+
+Para gerar o CSV que se comunica com o algoritmo:
+```bash
+python3 modelsCsv.py
 ```
 
 Para sair do ambiente virtual:
