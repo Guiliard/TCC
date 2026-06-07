@@ -8,6 +8,7 @@ int main(int argc, char *argv[]) {
     int max_iter = 100;
     int selection = CANDIDATE_SELECTION_ORDERED;
     int g_level = 2;
+    int export_ia_dataset = 0;
     float percent_of_prize = 0.2f;
     unsigned int seed = 12345;
 
@@ -59,6 +60,9 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
         }
+        else if (strcmp(argv[i], "--export-ia-dataset") == 0) {
+            export_ia_dataset = 1;
+        }
         else {
             fprintf(stderr, "Argumento invalido: %s\n", argv[i]);
             return 1;
@@ -92,6 +96,25 @@ int main(int argc, char *argv[]) {
     metrics* m = create_metrics();
 
     prob = init_environment(n_file, p_file, w_file, c_file, percent_of_prize);
+
+    if (export_ia_dataset) {
+        for (int i = 0; i < prob->num_all_cities; i++) {
+            printf("%s;%d;%d;%d;%d;%d;%.6f;%.6f\n",
+                instance,
+                g_level,
+                prob->num_all_cities,
+                prob->all_cities[i].id,
+                prob->all_cities[i].prize,
+                prob->all_cities[i].penalty,
+                prob->all_cities[i].avg_distance,
+                prob->all_cities[i].parameter
+            );
+        }
+
+        free_problem(prob);
+        free_metrics(m);
+        return 0;
+    }
 
     start_metrics(m);
 
