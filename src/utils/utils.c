@@ -86,7 +86,7 @@ void print_problem(problem *prob) {
     printf("========================================\n");
     printf("Cidades:\n");
     for (int i = 0; i < prob->num_all_cities; i++) {
-        printf("Cidade %d: Prêmio = %d, Penalidade = %d, Distância Média = %.2f, Parâmetro = %.2f\n", prob->all_cities[i].id, prob->all_cities[i].prize, prob->all_cities[i].penalty, prob->all_cities[i].avg_distance, prob->all_cities[i].parameter);
+        printf("Cidade %d: Prêmio = %d, Penalidade = %d, Distância Média = %.2f, Parâmetro = %.2f, Score = %.2f\n", prob->all_cities[i].id, prob->all_cities[i].prize, prob->all_cities[i].penalty, prob->all_cities[i].avg_distance, prob->all_cities[i].parameter, prob->all_cities[i].ml_score);
     }
     printf("\nMatriz de Distâncias Assimétrica:\n");
     print_matrix(prob->num_all_cities, prob->num_all_cities, prob->asymmetric_distances);   
@@ -103,7 +103,7 @@ void print_solution(solution *sol) {
     printf("========================================\n");
     printf("Cidades visitadas:\n");
     for (int i = 0; i < sol->num_visited_cities; i++) {
-        printf("Cidade %d: Prêmio = %d, Penalidade = %d, Distância Média = %.2f, Parâmetro = %.2f\n", sol->visited_cities[i].id, sol->visited_cities[i].prize, sol->visited_cities[i].penalty, sol->visited_cities[i].avg_distance, sol->visited_cities[i].parameter);
+        printf("Cidade %d: Prêmio = %d, Penalidade = %d, Distância Média = %.2f, Parâmetro = %.2f, Score = %.2f\n", sol->visited_cities[i].id, sol->visited_cities[i].prize, sol->visited_cities[i].penalty, sol->visited_cities[i].avg_distance, sol->visited_cities[i].parameter, sol->visited_cities[i].ml_score);
     }
     print_tour(sol->tour_size, sol->tour);
     printf("Número de cidades visitadas: %d\n", sol->num_visited_cities);

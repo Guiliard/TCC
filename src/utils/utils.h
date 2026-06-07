@@ -42,6 +42,7 @@ typedef struct city {
 
     float avg_distance;
     float parameter;
+    float ml_score;
 } city;
 
 typedef struct problem {

@@ -121,7 +121,7 @@ solution* build_initial_solution_grasp(problem *prob, float alpha, int solver_ty
             values[i] = -FLT_MAX;
 
             if (!visited[i]) {
-                float p = prob->all_cities[i].parameter;
+                float p = prob->all_cities[i].ml_score;
 
                 values[i] = p;
 

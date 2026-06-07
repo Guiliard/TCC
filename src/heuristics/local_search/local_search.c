@@ -11,8 +11,8 @@ void sort_candidates_by_parameter(problem *prob, int *candidates, int num_candid
 {
     for (int i = 0; i < num_candidates - 1; i++) {
         for (int j = i + 1; j < num_candidates; j++) {
-            float pi = prob->all_cities[candidates[i]].parameter;
-            float pj = prob->all_cities[candidates[j]].parameter;
+            float pi = prob->all_cities[candidates[i]].ml_score;
+            float pj = prob->all_cities[candidates[j]].ml_score;
 
             int should_swap = descending ? (pj > pi) : (pj < pi);
 
@@ -45,7 +45,7 @@ void roulette_select(problem *prob, int *candidates, int num_candidates)
 
         for (int i = 0; i < num_candidates; i++) {
             if (!used[i]) {
-                remaining_parameter += prob->all_cities[candidates[i]].parameter;
+                remaining_parameter += prob->all_cities[candidates[i]].ml_score;
             }
         }
 
@@ -66,7 +66,7 @@ void roulette_select(problem *prob, int *candidates, int num_candidates)
                 continue;
             }
 
-            cumulative += prob->all_cities[candidates[i]].parameter;
+            cumulative += prob->all_cities[candidates[i]].ml_score;
 
             if (cumulative >= random_value) {
                 selected_index = i;

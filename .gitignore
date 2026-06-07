@@ -44,3 +44,9 @@ concorde/*.sav
 concorde/*.sol
 concorde/*.pul
 concorde/*.res
+
+# Python virtual environments
+IA/venv/
+
+# Joblib files
+IA/*.joblib

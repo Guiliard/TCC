@@ -186,6 +186,28 @@ cd ..
 
 ---
 
+## Aprendizado Supervisionado
+
+```bash
+cd IA
+
+python3 -m venv venv
+
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+Para treinar os modelos:
+```bash
+python3 train_models.py
+```
+
+Para sair do ambiente virtual:
+```bash
+deactivate
+```
+
 ## Resultados
 
 Os resultados experimentais são armazenados em:

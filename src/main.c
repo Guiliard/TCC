@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
     solution* sol = NULL;
     metrics* m = create_metrics();
 
-    prob = init_environment(n_file, p_file, w_file, c_file, percent_of_prize);
+    prob = init_environment(n_file, p_file, w_file, c_file, percent_of_prize, instance, g_level);
 
     if (export_ia_dataset) {
         for (int i = 0; i < prob->num_all_cities; i++) {

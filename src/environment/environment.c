@@ -52,7 +52,34 @@ void initialize_alpha(problem *prob) {
     prob->alpha = total_sum + sum_n_largest;
 }
 
-problem* init_environment(char *number_file, char *prize_file, char* penalty_file, char *distance_file, float percent_of_prize) {
+void initialize_ml_scores(problem *prob, char *scores_file, char *instance, int g_level) {
+    char *scores_content = read_file(scores_file);
+
+    int total_lines_scores = count_lines(scores_content);
+
+    for (int i = 1; i < total_lines_scores; i++) {
+        char *line = get_line_of_file(scores_content, i);
+
+        char file_instance[128];
+        int file_g;
+        int city_id;
+        float ml_score;
+
+        sscanf(line, "%127[^;];%d;%d;%f", file_instance, &file_g, &city_id, &ml_score);
+
+        if (strcmp(file_instance, instance) == 0 && file_g == g_level) {
+            if (city_id >= 0 && city_id < prob->num_all_cities) {
+                prob->all_cities[city_id].ml_score = ml_score;
+            }
+        }
+
+        free(line);
+    }
+
+    free(scores_content);
+}
+
+problem* init_environment(char *number_file, char *prize_file, char* penalty_file, char *distance_file, float percent_of_prize, char *instance, int g_level) {
     problem* prob = allocate_vector(sizeof(problem), 1);
 
     char* number_content = read_file((char*)number_file);
@@ -97,6 +124,7 @@ problem* init_environment(char *number_file, char *prize_file, char* penalty_fil
 
     initialize_alpha(prob);
     initialize_city_parameters(prob);
+    initialize_ml_scores(prob, "IA/ml_scores.csv", instance, g_level);
 
     return prob;
 }
