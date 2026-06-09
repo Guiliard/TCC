@@ -14,15 +14,17 @@ SELECTION="ordered"
 SEED="123"
 
 MIN_REPETITIONS="3"
-MAX_REPETITIONS="10"
-TIME_LIMIT="3600"
+MAX_REPETITIONS="5"
+TIME_LIMIT="500"
 
-START_INSTANCE=""
-START_G=""
+START_INSTANCE="stilt316_15"
+START_G="8"
 
 mkdir -p "$OUT_DIR"
 
-echo -e "instance\tg\trun\tsolution\ttime" > "$RAW_FILE"
+if [ ! -f "$RAW_FILE" ]; then
+    echo -e "instance\tg\trun\tsolution\ttime" > "$RAW_FILE"
+fi
 
 if [ ! -x "$EXEC" ]; then
     echo "Executável não encontrado: $EXEC"
@@ -68,18 +70,21 @@ for instance_path in $(find "$DATASET_DIR" -mindepth 1 -maxdepth 1 -type d | sor
         for run in $(seq 1 "$MAX_REPETITIONS"); do
             echo "Rodando: instance=$instance g=$g run=$run"
 
-            output=$("$EXEC" \
+            output=$(cd "$PROJECT_DIR" && "$EXEC" \
                 --instance "$instance" \
                 --g "$g" \
                 --alpha "$ALPHA" \
                 --max-iter "$MAX_ITER" \
                 --selection "$SELECTION" \
-                --seed "$SEED" 2>/dev/null)
+                --seed "$SEED" 2>&1)
 
             status=$?
 
             if [ $status -ne 0 ]; then
                 echo "Erro na execução: instance=$instance g=$g run=$run status=$status"
+                echo "Saída do executável:"
+                echo "$output"
+                echo "----------------------------------------"
                 continue
             fi
 
