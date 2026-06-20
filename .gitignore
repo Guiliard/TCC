@@ -49,4 +49,4 @@ concorde/*.res
 IA/venv/
 
 # Joblib files
-IA/*.joblib
+IA/joblib/*.joblib

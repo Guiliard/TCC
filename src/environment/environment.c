@@ -124,7 +124,7 @@ problem* init_environment(char *number_file, char *prize_file, char* penalty_fil
 
     initialize_alpha(prob);
     initialize_city_parameters(prob);
-    initialize_ml_scores(prob, "IA/ml_scores.csv", instance, g_level);
+    initialize_ml_scores(prob, "IA/data/ml_scores_best.csv", instance, g_level);
 
     return prob;
 }

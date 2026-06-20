@@ -1,0 +1,3 @@
+model;best_roc_auc_cv;max_iter;learning_rate;max_leaf_nodes;min_samples_leaf;l2_regularization;n_estimators;max_depth;subsample;colsample_bytree;min_child_weight;gamma;reg_alpha;reg_lambda
+xgboost;0.9196935340429683;;0.10043681293571805;;;;1172.0;7.0;0.9167563544876365;0.9557411554428928;1.0;0.5748407487203464;6.5681329869256e-08;0.013564272974185153
+hist_gradient_boosting;0.9184680252558977;616.0;0.18202070404826554;59.0;10.0;1.7631713913534216e-07;;;;;;;;
