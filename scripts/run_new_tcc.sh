@@ -5,20 +5,20 @@ PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 EXEC="$PROJECT_DIR/build/executable"
 DATASET_DIR="$PROJECT_DIR/dataset"
 
-OUT_DIR="$PROJECT_DIR/results/new_results"
+OUT_DIR="$PROJECT_DIR/results/final_results"
 RAW_FILE="$OUT_DIR/tcc_raw_results.tsv"
 
-ALPHA="0.3971"
+ALPHA="0.2191"
 MAX_ITER="175"
 SELECTION="ordered"
 SEED="123"
 
 MIN_REPETITIONS="3"
-MAX_REPETITIONS="5"
-TIME_LIMIT="500"
+MAX_REPETITIONS="10"
+TIME_LIMIT="3600"
 
-START_INSTANCE="stilt316_15"
-START_G="8"
+START_INSTANCE=""
+START_G=""
 
 mkdir -p "$OUT_DIR"
 
