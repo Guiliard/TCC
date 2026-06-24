@@ -2,10 +2,10 @@
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
-SUMMARY_FILE="$PROJECT_DIR/results/new_results/tcc_summary_results.tsv"
+SUMMARY_FILE="$PROJECT_DIR/results/final_results/tcc_summary_results.tsv"
 DATASET_DIR="$PROJECT_DIR/dataset"
 
-OUT_DIR="$PROJECT_DIR/results/new_results"
+OUT_DIR="$PROJECT_DIR/results/final_results"
 DETAIL_TSV="$OUT_DIR/tcc_detailed_by_group.tsv"
 DETAIL_TABLE="$OUT_DIR/tcc_detailed_by_group_table.txt"
 
