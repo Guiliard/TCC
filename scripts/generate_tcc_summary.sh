@@ -2,12 +2,12 @@
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
-RAW_FILE="$PROJECT_DIR/results/final_results/tcc_raw_results.tsv"
+RAW_FILE="$PROJECT_DIR/results/final_results_best/tcc_raw_results.tsv"
 
 GUROBI_FILE="$PROJECT_DIR/gurobi/results/merged/gurobi_results.tsv"
 BOUNDS_FILE="$PROJECT_DIR/doc/bounds.txt"
 
-OUT_DIR="$PROJECT_DIR/results/final_results"
+OUT_DIR="$PROJECT_DIR/results/final_results_best"
 TSV_FILE="$OUT_DIR/tcc_summary_results.tsv"
 TABLE_FILE="$OUT_DIR/tcc_summary_results_table.txt"
 REPORT_FILE="$OUT_DIR/tcc_report.txt"

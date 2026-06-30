@@ -2,7 +2,7 @@
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
-OUT_DIR="$PROJECT_DIR/results/final_results"
+OUT_DIR="$PROJECT_DIR/results/final_results_best"
 
 SMALL_TSV="$OUT_DIR/tcc_detailed_small.tsv"
 MEDIUM_TSV="$OUT_DIR/tcc_detailed_medium.tsv"
