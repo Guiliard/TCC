@@ -5,7 +5,7 @@ PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 EXEC="$PROJECT_DIR/build/executable"
 DATASET_DIR="$PROJECT_DIR/dataset"
 
-OUT_DIR="$PROJECT_DIR/results/final_results"
+OUT_DIR="$PROJECT_DIR/results/final_results_best"
 RAW_FILE="$OUT_DIR/tcc_raw_results.tsv"
 
 ALPHA="0.2191"
