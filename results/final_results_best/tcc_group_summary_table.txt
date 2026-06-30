@@ -1,0 +1,5 @@
+grupo          instancias  experimentos  gap_medio_gurobi_percent  gap_medio_UB_percent  tempo_medio_algoritmo  tempo_medio_gurobi  gurobi_time_limit  algoritmo_mais_rapido  melhor_que_UB  otimos_globais  gap_gurobi_acima_10
+Pequeno porte  43          129           2.0625                    0.7070                2.8130                 123.0116            0                  114                    36             48              5
+Médio porte    15          45            2.3753                    1.8672                58.9116                32.6600             0                  12                     14             17              0
+Grande porte   26          78            10.8398                   5.4021                902.4744               2471.9513           45                 62                     19             2               44
+Geral          84          252           4.8352                    2.3674                291.2972               833.9302            45                 188                    69             67              49
