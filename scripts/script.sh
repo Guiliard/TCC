@@ -2,8 +2,8 @@
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
-INPUT_FILE="$PROJECT_DIR/results/new_results/tcc_detailed_large.tsv"
-OUT_FILE="$PROJECT_DIR/results/new_results/tabela_grande_porte_latex.txt"
+INPUT_FILE="$PROJECT_DIR/results/final_results_best/tcc_detailed_small.tsv"
+OUT_FILE="$PROJECT_DIR/results/final_results_best/tabela_pequeno_porte_latex.txt"
 
 python3 <<PY
 import csv
