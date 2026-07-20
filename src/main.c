@@ -11,6 +11,7 @@ int main(int argc, char *argv[]) {
     int export_ia_dataset = 0;
     float percent_of_prize = 0.2f;
     unsigned int seed = 12345;
+    int num_threads = get_num_threads();
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--instance") == 0 && i + 1 < argc) {
@@ -63,6 +64,9 @@ int main(int argc, char *argv[]) {
         else if (strcmp(argv[i], "--export-ia-dataset") == 0) {
             export_ia_dataset = 1;
         }
+        else if (strcmp(argv[i], "--threads") == 0 && i + 1 < argc) {
+            num_threads = atoi(argv[++i]);
+        }
         else {
             fprintf(stderr, "Argumento invalido: %s\n", argv[i]);
             return 1;
@@ -86,6 +90,11 @@ int main(int argc, char *argv[]) {
 
     if (max_iter <= 0) {
         fprintf(stderr, "Erro: max_iter deve ser maior que zero\n");
+        return 1;
+    }
+
+    if (num_threads <= 0) {
+        fprintf(stderr, "Erro: threads deve ser maior que zero\n");
         return 1;
     }
 
@@ -118,7 +127,7 @@ int main(int argc, char *argv[]) {
 
     start_metrics(m);
 
-    sol = grasp(prob, max_iter, alpha, selection);
+    sol = grasp(prob, max_iter, alpha, selection, num_threads);
 
     stop_metrics(m);
 

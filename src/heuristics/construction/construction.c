@@ -1,8 +1,8 @@
 #include "construction.h"
 
-solution* grasp(problem *prob, int max_iter, float alpha, int candidate_selection_strategy)
+solution* grasp(problem *prob, int max_iter, float alpha, int candidate_selection_strategy, int num_threads)
 {
-    int local_search_threads = get_num_threads();
+    int local_search_threads = num_threads;
 
     solution *thread_best_sol[local_search_threads];
     float thread_best_cost[local_search_threads];
