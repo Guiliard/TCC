@@ -7,7 +7,7 @@ OUT_DIR="$PROJECT_DIR/results/threads_scalability"
 RAW_FILE="$OUT_DIR/threads_scalability.tsv"
 
 ALPHA="0.2191"
-MAX_ITER="50"
+MAX_ITER="100"
 SELECTION="ordered"
 SEED="123"
 
